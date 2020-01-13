@@ -1,0 +1,24 @@
+.title{
+  text-align: left;
+  width:100%;
+}
+
+.title view{
+  font-weight:900px;
+  padding:5pt 10pt;
+  color:#fb0;
+  font-size:20pt;
+  display: block;
+}
+
+.view_group{
+    width:100%;
+}
+.view_group view{
+    min-height:20pt;
+    margin:10pt;
+    line-height:20pt;
+    padding:5pt 10pt;
+    border:2px solid #ddd;
+
+}

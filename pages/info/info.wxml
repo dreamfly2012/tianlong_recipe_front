@@ -1,0 +1,23 @@
+<view class="container">
+    <text>{{recipe.name}}</text>
+    <image class="" mode="aspectFit" src="{{recipe.image_src}}"></image>
+    <view class="title">
+        <view>材料</view>
+    </view>
+    <view class="view_group">
+        <view wx:for="{{recipe.ingredients}}" wx:key="item" class="">
+            {{item.name}}:{{item.qty}}
+        </view>
+    </view>
+    
+    <view class="title">
+        <view>步骤</view>
+    </view>
+    
+    <view class="view_group">
+    <view wx:for="{{recipe.directions}}" wx:key="item" class="recipe_wrap">
+        {{index+1}}. {{item.description}}
+    </view>
+    </view>
+    
+</view>
