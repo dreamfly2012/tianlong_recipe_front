@@ -2,8 +2,26 @@
   "pages": [
     "pages/index/index",
     "pages/logs/logs",
-    "pages/info/info"
+    "pages/info/info",
+    "pages/category/index"
   ],
+  "tabBar": {
+    "color": "#666",
+    "selectedColor": "#ff0000",
+    "borderStyle": "white",
+    "backgroundColor": "#fafafa",
+    "list": [{
+      "pagePath": "pages/index/index",
+      "iconPath": "image/home_black.png",
+      "selectedIconPath": "image/home.png",
+      "text": "推荐"
+    },{
+      "pagePath": "pages/category/index",
+      "iconPath": "image/category_black.png",
+      "selectedIconPath": "image/category.png",
+      "text": "分类"
+    }]
+  },
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
