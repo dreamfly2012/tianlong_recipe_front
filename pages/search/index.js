@@ -2,7 +2,7 @@
 //获取应用实例
 const app = getApp()
 
-import { getRecipes } from '../../api/recipe.js'
+import { search } from '../../api/search.js'
 
 Page({
   data: {
@@ -10,15 +10,15 @@ Page({
     page: 1,
   },
 
-  onLoad: function () {
-    this.getData(1)
+  onLoad: function (options) {
+    this.getData(1,options.name)
   },
 
-  getData: function (page) {
+  getData: function (page,name) {
     this.loading = true
 
-    getRecipes({
-      // api params
+    search({
+      name:name,
       page:page
     }).then(res => {
       let recipes = res.data;

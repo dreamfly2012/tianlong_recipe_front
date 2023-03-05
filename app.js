@@ -9,6 +9,7 @@ App({
   },
   globalData: {
     userInfo: null,
-    baseUrl : "https://bbs.80shihua.com/"
+    baseUrl : "https://recipe.80shihua.com/",
+    //baseUrl:"http://127.0.0.1:8000/",
   }
 })

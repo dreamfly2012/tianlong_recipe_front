@@ -1,41 +1,25 @@
+<view class="search-wrapper">
+   <input placeholder="请输入菜品名称" focus="{{focus}}" bindinput="searchChange" bindconfirm="search" class="search" value="{{inputValue}}"/>
+   <image src="/image/search.png" mode="aspectFit" class="search_icon"></image>
+</view>
 <view class="classify">
  
   <!--分类导航栏-->
   <scroll-view class='left-navbar' scroll-y="true">
-    <view wx:for="{{cateItems}}" class="{{ currentTab == index ? 'active' : '' }}" wx:key="unique" bindtap="{{ currentTab != index ? 'navbarTap':'' }}" id="{{index}}" data-screenId="{{item.cate_id}}">{{item.cate_name}}
+    <view wx:for="{{cateItems}}" class="{{ currentTab == index ? 'active' : '' }}" wx:key="unique" bindtap="{{ currentTab != index ? 'navbarTap':'' }}" id="{{index}}" data-cate_id="{{item.cate_id}}">{{item.cate_name}}
     </view>
-    
-    <!--
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    <view>其他分类</view>
-    -->
   </scroll-view>
  
   <scroll-view id="right" scroll-y="true" scroll-top="{{scrollTop}}">
     <!--顶部图片-->
     <view class="goods-banner">
-      <image class="img-banner" src="{{childrenArray.showImageUrl}}" wx:if="{{childrenArray.showImageUrl}}" mode="scaleToFill"></image>
+      <image class="img-banner" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1879717261,2278189813&fm=26&gp=0.jpg" wx:if="{{}}" mode="scaleToFill"></image>
     </view>
-    <!--商品展示-->
-    <view class="goods-list" wx:for="{{childrenArray.childrenScreenArray}}" wx:key="unique">
-      <view class="goods-title">{{item.screenName}}</view>
-      <view wx:for="{{item.childrenScreenArray}}" class="goods" wx:key="unique" bindtap="ToSearchResult" id="{{item.screenName}}" >
-        <image class="img" src="{{item.showImageUrl}}" wx:if="{{item.showImageUrl}}"></image>
-        <text>{{item.screenName}}</text>
-      </view>
+
+
+    <!--类别-->
+    <view class="goods-list" wx:for="{{children}}" wx:key="unique">
+      <view class="goods-title" bindtap="jumplist" data-category_id="{{item.category_id}}">{{item.name}}</view>
     </view>
  
     <!--

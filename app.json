@@ -3,7 +3,9 @@
     "pages/index/index",
     "pages/logs/logs",
     "pages/info/info",
-    "pages/category/index"
+    "pages/category/index",
+    "pages/list/index",
+    "pages/search/index"
   ],
   "tabBar": {
     "color": "#666",
@@ -30,5 +32,6 @@
     "enablePullDownRefresh": true,
     "onReachBottomDistance": 5
   },
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
 }

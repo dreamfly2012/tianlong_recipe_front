@@ -10,15 +10,15 @@ Page({
     page: 1,
   },
 
-  onLoad: function () {
-    this.getData(1)
+  onLoad: function (options) {
+    this.getData(1,options.category_id)
   },
 
-  getData: function (page) {
+  getData: function (page,category_id) {
     this.loading = true
 
     getRecipes({
-      // api params
+      category_id:category_id,
       page:page
     }).then(res => {
       let recipes = res.data;

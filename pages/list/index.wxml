@@ -1,0 +1,15 @@
+<!--index.wxml-->
+<view class="container">
+  
+    <view wx:for="{{recipes}}" wx:key="item" class="recipe_wrap">
+    <view bindtap='jumpdetail' data-id="{{item.id}}"> 
+    
+    <image class="pic" mode="aspectFill" src="{{item.image_src}}"></image>
+    <text class="recipe_name">{{item.name}}</text>
+    
+    </view>
+    </view>
+    
+   
+  
+</view>
