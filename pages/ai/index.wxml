@@ -1,0 +1,57 @@
+<view class="container">
+  <!-- 每日推荐 -->
+  <view class="section">
+    <view class="section-title">今日推荐</view>
+    <scroll-view scroll-x class="recipe-scroll">
+      <view class="recipe-list">
+        <view class="recipe-item" wx:for="{{dailyRecipes}}" wx:key="id" bindtap="jumpToDetail" data-id="{{item.id}}">
+          <image src="{{item.image}}" mode="aspectFill"></image>
+          <view class="recipe-name">{{item.name}}</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+
+
+  <!-- 个性化推荐 -->
+  <view class="section">
+    <view class="section-title">为您推荐</view>
+    <view class="recipe-grid">
+      <view class="recipe-card" wx:for="{{personalizedRecipes}}" wx:key="id" bindtap="jumpToDetail" data-id="{{item.id}}">
+        <image src="{{item.image}}" mode="aspectFill"></image>
+        <view class="recipe-info">
+          <view class="recipe-name">{{item.name}}</view>
+          <view class="recipe-desc">{{item.description}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 智能菜单 -->
+  <view class="section">
+    <view class="section-title">智能菜单</view>
+    <button class="function-btn" bindtap="generateMealPlan">生成今日菜单</button>
+    <view class="meal-plan" wx:if="{{mealPlan}}">
+      <view class="meal-item" wx:for="{{mealPlan.meals}}" wx:key="index">
+        <view class="meal-time">{{item.time}}</view>
+        <view class="meal-recipes">
+          <view class="recipe-link" wx:for="{{item.recipes}}" wx:for-item="recipe" wx:key="id"
+                bindtap="jumpToDetail" data-id="{{recipe.id}}">
+            {{recipe.name}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 语音助手 -->
+  <view class="section">
+    <view class="section-title">语音助手</view>
+    <view class="voice-box">
+      <image src="/image/yuyin.png" class="voice-icon {{isRecording ? 'recording' : ''}}" 
+             bindtouchstart="startVoiceInput" bindtouchend="stopVoiceInput"></image>
+      <view class="voice-tip">{{isRecording ? '松开结束' : '按住说话'}}</view>
+    </view>
+  </view>
+</view>

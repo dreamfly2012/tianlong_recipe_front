@@ -2,9 +2,8 @@
 //获取应用实例
 const app = getApp()
 
-import {
-  getCategories
-} from '../../api/category.js'
+import { getCategories } from '../../api/category.js'
+import { getVoiceRecommend } from '../../api/ai.js'
 
 Page({
   data: {
@@ -12,88 +11,155 @@ Page({
     children: [],
     inputValue: "",
     curNav: 1,
-    curIndex: 0
+    curIndex: 0,
+    isRecording: false
   },
 
   onLoad: function (options) {
-    var that = this;
     //获得分类筛选
     getCategories({
-
+      parent_id: 0
     }).then(res => {
-      let recipes = res.data;
+      let categories = res.data;
       let items = [];
-      console.log(this.data.cateItems);
-      for (let i = 0; i < recipes.length; i++) {
+      for (let i = 0; i < categories.length; i++) {
         let info = {};
-        info.cate_id = recipes[i].category_id;
-        info.cate_name = recipes[i].name;
+        info.cate_id = categories[i].category_id;
+        info.cate_name = categories[i].name;
         info.ishaveChild = false;
         info.children = [];
         items.push(info);
       }
       this.setData({
-        'cateItems':items
-      });
-
-      getCategories({
-        parent_id: 1
-      }).then(res => {
-        let categories = res.data;
-        console.log(categories);
-        
-        this.setData({
-          'children':categories
-        });
+        cateItems: items
       })
-
-    })
-
-
-
-
-  },
-
-  search:function(e){
-    let name = e.detail.value;
-    wx.navigateTo({
-      url:'../search/index?name=' + name,  //跳转页面的路径，可带参数 ？隔开，不同参数用 & 分隔；相对路径，不需要.wxml后缀
-      success:function(){}        //成功后的回调；
-      
+    }).catch(error => {
+      console.error('获取分类失败:', error)
+      wx.showToast({
+        title: '获取分类失败',
+        icon: 'none'
+      })
     })
   },
 
-  jumplist:function(e){
-    let category_id = e.target.dataset.category_id;
-    wx.navigateTo({
-      url:'../list/index?category_id=' + category_id,  //跳转页面的路径，可带参数 ？隔开，不同参数用 & 分隔；相对路径，不需要.wxml后缀
-      success:function(){}        //成功后的回调；
-      
-    })
+  // 开始语音输入
+  startVoiceInput: function() {
+    this.setData({ isRecording: true })
+    const plugin = requirePlugin("WechatSI")
+    const manager = plugin.getRecordRecognitionManager()
+    
+    manager.onStart = (res) => {
+      console.log('录音开始')
+      wx.showToast({
+        title: '请说话...',
+        icon: 'none',
+        duration: 60000
+      })
+    }
+    
+    manager.onStop = (res) => {
+      this.setData({ isRecording: false })
+      wx.hideToast()
+      if (res.result) {
+        console.log(res.result)
+        this.searchByVoice(res.result)
+      } else {
+        wx.showToast({
+          title: '未能识别，请重试',
+          icon: 'none'
+        })
+      }
+    }
+    
+    manager.onError = (res) => {
+      this.setData({ isRecording: false })
+      wx.hideToast()
+      console.error('语音识别错误:', res)
+      wx.showToast({
+        title: '语音识别失败，请重试',
+        icon: 'none'
+      })
+    }
+    
+    manager.start({ duration: 60000, lang: "zh_CN" })
   },
 
-  navbarTap: function (e) {
-    var that = this;
-    console.log(e);
+  // 停止语音输入
+  stopVoiceInput: function() {
+    const plugin = requirePlugin("WechatSI")
+    const manager = plugin.getRecordRecognitionManager()
+    manager.stop()
+  },
+
+  // 语音搜索
+  searchByVoice: function(voiceText) {
     this.setData({
-      currentTab: e.currentTarget.id, //按钮CSS变化
-      category: e.currentTarget.dataset.cate_id,
-      scrollTop: 0, //切换导航后，控制右侧滚动视图回到顶部
+      inputValue: voiceText
     })
-    //刷新右侧内容的数据
-    var cate_id = this.data.category;
+  },
+
+  // 文字搜索
+  search: function() {
+    if (!this.data.inputValue.trim()) {
+      wx.showToast({
+        title: '请输入搜索内容',
+        icon: 'none'
+      })
+      return
+    }
+    wx.navigateTo({
+      url: '/pages/search/index?name=' + encodeURIComponent(this.data.inputValue)
+    })
+  },
+
+  // 搜索框输入事件
+  searchChange: function(e) {
+    this.setData({
+      inputValue: e.detail.value
+    })
+  },
+
+  // 点击分类项
+  switchRightTab: function(e) {
+    let id = e.currentTarget.dataset.id;
+    let index = e.currentTarget.dataset.index;
+    this.setData({
+      curNav: id,
+      curIndex: index
+    })
+
+    // 获取子分类
     getCategories({
-      parent_id: cate_id
+      parent_id: id
     }).then(res => {
       let categories = res.data;
-      console.log(categories);
-      
-      this.setData({
-        'children':categories
-      });
+      if (categories && categories.length > 0) {
+        this.setData({
+          children: categories
+        })
+      } else {
+        this.setData({
+          children: []
+        })
+        wx.showToast({
+          title: '暂无子分类',
+          icon: 'none'
+        })
+      }
+    }).catch(error => {
+      console.error('获取子分类失败:', error)
+      wx.showToast({
+        title: '获取子分类失败',
+        icon: 'none'
+      })
     })
-
-
-
   },
+
+  // 跳转到分类列表页
+  jumplist: function(e) {
+    let category_id = e.currentTarget.dataset.category_id;
+    wx.navigateTo({
+      url: '/pages/list/index?category_id=' + category_id
+    })
+  }
 })

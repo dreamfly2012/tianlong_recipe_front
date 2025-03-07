@@ -1,12 +1,17 @@
 <view class="search-wrapper">
-   <input placeholder="请输入菜品名称" focus="{{focus}}" bindinput="searchChange" bindconfirm="search" class="search" value="{{inputValue}}"/>
-   <image src="/image/search.png" mode="aspectFit" class="search_icon"></image>
+  <view class="search-box">
+    <input placeholder="请输入菜品名称" focus="{{focus}}" bindinput="searchChange" bindconfirm="search" class="search" value="{{inputValue}}"/>
+    <image src="/image/search.png" mode="aspectFit" class="search-icon" bindtap="search"></image>
+    <view class="voice-btn {{isRecording ? 'recording' : ''}}" bindtouchstart="startVoiceInput" bindtouchend="stopVoiceInput">
+      <image src="/image/yuyin.png" mode="aspectFit" class="voice-icon"></image>
+    </view>
+  </view>
 </view>
 <view class="classify">
  
   <!--分类导航栏-->
   <scroll-view class='left-navbar' scroll-y="true">
-    <view wx:for="{{cateItems}}" class="{{ currentTab == index ? 'active' : '' }}" wx:key="unique" bindtap="{{ currentTab != index ? 'navbarTap':'' }}" id="{{index}}" data-cate_id="{{item.cate_id}}">{{item.cate_name}}
+    <view wx:for="{{cateItems}}" class="{{ curNav == item.cate_id ? 'active' : '' }}" wx:key="unique" bindtap="switchRightTab" data-id="{{item.cate_id}}" data-index="{{index}}">{{item.cate_name}}
     </view>
   </scroll-view>
  

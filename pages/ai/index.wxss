@@ -1,0 +1,262 @@
+.container {
+  padding: 20rpx;
+  background: #f8f9fa;
+}
+
+.section {
+  margin-bottom: 30rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 24rpx;
+  color: #2c3e50;
+  position: relative;
+  padding-left: 24rpx;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8rpx;
+  height: 32rpx;
+  background: #ff6b6b;
+  border-radius: 4rpx;
+}
+
+/* 每日推荐样式 */
+.recipe-scroll {
+  white-space: nowrap;
+  margin: 0 -24rpx;
+  padding: 0 24rpx;
+}
+
+.recipe-list {
+  display: inline-flex;
+  padding: 10rpx 0;
+}
+
+.recipe-item {
+  margin-right: 24rpx;
+  width: 280rpx;
+  transition: transform 0.3s ease;
+}
+
+.recipe-item:active {
+  transform: scale(0.98);
+}
+
+.recipe-item image {
+  width: 280rpx;
+  height: 200rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+}
+
+.recipe-name {
+  font-size: 28rpx;
+  margin-top: 16rpx;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  color: #34495e;
+}
+
+/* 食材搜索样式 */
+.search-box {
+  display: flex;
+  margin: 20rpx 0;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 20rpx;
+  border: 2rpx solid #e9ecef;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+  font-size: 28rpx;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 2rpx rgba(255,107,107,0.2);
+}
+
+.search-btn {
+  width: 180rpx;
+  background: #ff6b6b;
+  color: #fff;
+  font-size: 28rpx;
+  padding: 0;
+  line-height: 84rpx;
+  border-radius: 12rpx;
+  transition: all 0.3s ease;
+}
+
+.search-btn:active {
+  transform: translateY(2rpx);
+  background: #ff5252;
+}
+
+/* 个性化推荐样式 */
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+  padding: 10rpx 0;
+}
+
+.recipe-card {
+  background: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.08);
+  transition: transform 0.3s ease;
+}
+
+.recipe-card:active {
+  transform: translateY(2rpx);
+}
+
+.recipe-card image {
+  width: 100%;
+  height: 240rpx;
+  object-fit: cover;
+}
+
+.recipe-info {
+  padding: 20rpx;
+}
+
+.recipe-desc {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 12rpx;
+  line-height: 1.4;
+}
+
+/* 语音助手样式 */
+.voice-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30rpx 0;
+}
+
+.voice-icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 20rpx;
+  transition: all 0.3s ease;
+}
+
+.voice-icon.recording {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.voice-tip {
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 智能菜单样式 */
+.function-btn {
+  background: #ff6b6b;
+  color: #fff;
+  font-size: 30rpx;
+  padding: 20rpx 40rpx;
+  border-radius: 12rpx;
+  margin: 20rpx 0;
+  transition: all 0.3s ease;
+}
+
+.function-btn:active {
+  transform: translateY(2rpx);
+  background: #ff5252;
+}
+
+.meal-plan {
+  margin-top: 24rpx;
+}
+
+.meal-item {
+  margin-bottom: 20rpx;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+}
+
+.meal-time {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 12rpx;
+}
+
+.meal-recipes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.recipe-link {
+  font-size: 26rpx;
+  color: #ff6b6b;
+  padding: 8rpx 16rpx;
+  background: rgba(255,107,107,0.1);
+  border-radius: 8rpx;
+  transition: all 0.3s ease;
+}
+
+.recipe-link:active {
+  background: rgba(255,107,107,0.2);
+}
+
+/* 语音助手样式 */
+.voice-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 0;
+}
+
+.voice-icon {
+  width: 100rpx;
+  height: 100rpx;
+  margin-bottom: 10rpx;
+}
+
+.voice-icon.recording {
+  animation: pulse 1s infinite;
+}
+
+.voice-tip {
+  font-size: 26rpx;
+  color: #666;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

@@ -1,6 +1,12 @@
 <view class="container">
-    <text>{{recipe.name}}</text>
-    <image class="" mode="aspectFit" src="{{recipe.image_src}}"></image>
+    <view class="recipe-header">
+        <text class="recipe-name">{{recipe.name}}</text>
+        <view class="favorite-btn {{isFavorite ? 'active' : ''}}" bindtap="toggleFavorite">
+            <text class="favorite-icon">{{isFavorite ? '❤' : '♡'}}</text>
+            <text class="favorite-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
+        </view>
+    </view>
+    <image class="recipe-image" mode="aspectFit" src="{{recipe.image_src}}"></image>
     <view class="title">
         <view>材料</view>
     </view>

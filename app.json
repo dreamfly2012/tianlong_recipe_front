@@ -3,9 +3,11 @@
     "pages/index/index",
     "pages/logs/logs",
     "pages/info/info",
+    "pages/profile/index",
     "pages/category/index",
     "pages/list/index",
-    "pages/search/index"
+    "pages/search/index",
+    "pages/ai/index"
   ],
   "tabBar": {
     "color": "#666",
@@ -14,24 +16,40 @@
     "backgroundColor": "#fafafa",
     "list": [{
       "pagePath": "pages/index/index",
-      "iconPath": "image/home_black.png",
-      "selectedIconPath": "image/home.png",
-      "text": "推荐"
+      "text": "推荐",
+      "icon": "/image/home_black.png",
+      "selectedIcon": "/image/home.png"
     },{
       "pagePath": "pages/category/index",
-      "iconPath": "image/category_black.png",
-      "selectedIconPath": "image/category.png",
-      "text": "分类"
+      "text": "分类",
+      "icon": "/image/category_black.png",
+      "selectedIcon": "/image/category.png"
+    },{
+      "pagePath": "pages/ai/index",
+      "text": "智能助手",
+      "icon": "/image/search.png",
+      "selectedIcon": "/image/search.png"
+    },{
+      "pagePath": "pages/profile/index",
+      "text": "我的",
+      "icon": "/image/profile_black.png",
+      "selectedIcon": "/image/profile.png"
     }]
   },
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "天龙菜谱",
+    "navigationBarTitleText": "美食菜谱",
     "navigationBarTextStyle": "black",
     "enablePullDownRefresh": true,
     "onReachBottomDistance": 5
   },
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "plugins": {
+    "WechatSI": {
+      "version": "0.3.1",
+      "provider": "wx069ba97219f66d99"
+    }
+  }
 }
