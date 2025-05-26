@@ -21,7 +21,7 @@ Page({
       // api params
       page:page
     }).then(res => {
-      let recipes = res.data;
+      let recipes = res.data.list || [];
       if(recipes.length==0){
         wx.showToast({
           title: '没有更多数据了',

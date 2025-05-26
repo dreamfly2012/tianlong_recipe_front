@@ -6,7 +6,7 @@
             <text class="favorite-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
         </view>
     </view>
-    <image class="recipe-image" mode="aspectFit" src="{{recipe.image_src}}"></image>
+    <image class="recipe-image" mode="aspectFit" src="{{recipe.image}}"></image>
     <view class="title">
         <view>材料</view>
     </view>

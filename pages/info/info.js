@@ -20,7 +20,7 @@ Page({
 
     getRecipe(id).then(res => {
       that.setData({
-        recipe: res,
+        recipe: res.data,
         isFavorite
       })
     }).catch(error => {

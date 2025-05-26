@@ -17,23 +17,23 @@
     "list": [{
       "pagePath": "pages/index/index",
       "text": "推荐",
-      "icon": "/image/home_black.png",
-      "selectedIcon": "/image/home.png"
+      "iconPath": "image/home_black.png",
+      "selectedIconPath": "image/home.png"
     },{
       "pagePath": "pages/category/index",
       "text": "分类",
-      "icon": "/image/category_black.png",
-      "selectedIcon": "/image/category.png"
+      "iconPath": "image/category_black.png",
+      "selectedIconPath": "image/category.png"
     },{
       "pagePath": "pages/ai/index",
       "text": "智能助手",
-      "icon": "/image/search.png",
-      "selectedIcon": "/image/search.png"
+      "iconPath": "image/ai_black.png",
+      "selectedIconPath": "image/ai.png"
     },{
       "pagePath": "pages/profile/index",
       "text": "我的",
-      "icon": "/image/profile_black.png",
-      "selectedIcon": "/image/profile.png"
+      "iconPath": "image/profile_black.png",
+      "selectedIconPath": "image/profile.png"
     }]
   },
   "window": {
@@ -48,7 +48,7 @@
   "lazyCodeLoading": "requiredComponents",
   "plugins": {
     "WechatSI": {
-      "version": "0.3.1",
+      "version": "0.3.6",
       "provider": "wx069ba97219f66d99"
     }
   }
