@@ -1,7 +1,7 @@
 // AI功能页面
 const app = getApp()
 
-import { getDailyRecommend, getRecipesByIngredients, getPersonalizedRecommend, getMealPlan } from '../../api/ai.js'
+import { getDailyRecommend, getPersonalizedRecommend } from '../../api/ai.js'
 
 Page({
   data: {
@@ -12,44 +12,8 @@ Page({
 
   onLoad: function () {
     // 模拟每日推荐数据
-    this.setData({
-      dailyRecipes: [{
-        id: 1,
-        name: '红烧排骨',
-        image: 'https://images.unsplash.com/photo-1544025162-d76694265947',
-        description: '美味可口的红烧排骨'
-      }, {
-        id: 2,
-        name: '清炒小白菜',
-        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c',
-        description: '营养健康的素菜'
-      }, {
-        id: 3,
-        name: '麻婆豆腐',
-        image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19',
-        description: '川菜经典名菜'
-      }]
-    })
-
-    // 模拟个性化推荐数据
-    this.setData({
-      personalizedRecipes: [{
-        id: 4,
-        name: '糖醋里脊',
-        image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
-        description: '外酥里嫩，酸甜可口'
-      }, {
-        id: 5,
-        name: '水煮鱼',
-        image: 'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327',
-        description: '麻辣鲜香的川菜代表'
-      }, {
-        id: 6,
-        name: '蒜蓉炒菜心',
-        image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999',
-        description: '清淡爽口的快手菜'
-      }]
-    })
+    this.loadDailyRecommend();
+    this.loadPersonalizedRecommend();
   },
 
   // 加载每日推荐
@@ -80,21 +44,24 @@ Page({
 
   // 生成智能菜单
   generateMealPlan: function() {
-    const preferences = {
-      goal: 'healthy', // 可以通过用户设置获取
-      restrictions: [] // 可以通过用户设置获取
-    }
+    // const preferences = {
+    //   goal: 'healthy', // 可以通过用户设置获取
+    //   restrictions: [] // 可以通过用户设置获取
+    // }
 
-    getMealPlan(preferences).then(res => {
-      this.setData({
-        mealPlan: res.data
-      })
-    }).catch(error => {
-      console.error('生成菜单失败:', error)
-      wx.showToast({
-        title: '生成失败',
-        icon: 'none'
-      })
+    // getMealPlan(preferences).then(res => {
+    //   this.setData({
+    //     mealPlan: res.data
+    //   })
+    // }).catch(error => {
+    //   console.error('生成菜单失败:', error)
+    //   wx.showToast({
+    //     title: '生成失败',
+    //     icon: 'none'
+    //   })
+    // })
+    wx.navigateTo({
+      url: '/pages/ai/menu'
     })
   },
 
@@ -108,7 +75,7 @@ Page({
   // 跳转到菜品详情
   jumpToDetail: function(e) {
     const id = e.currentTarget.dataset.id
-    app.requestid = id
+    console.log(id)
     wx.navigateTo({
       url: '/pages/info/info?id=' + id
     })

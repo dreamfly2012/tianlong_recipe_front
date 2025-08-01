@@ -1,0 +1,44 @@
+<view class="menu-container">
+  <!-- 食材输入 -->
+  <view class="form-group">
+    <view class="label">食材（用逗号分隔）</view>
+    <input class="input" placeholder="如：三文鱼,芦笋" value="{{ingredientsInput}}" bindinput="onIngredientsInput"/>
+  </view>
+  <!-- 口味偏好输入 -->
+  <view class="form-group">
+    <view class="label">口味偏好（可选，用逗号分隔）</view>
+    <input class="input" placeholder="如：低脂,健康" value="{{preferencesInput}}" bindinput="onPreferencesInput"/>
+  </view>
+  <!-- 排除项输入 -->
+  <view class="form-group">
+    <view class="label">排除食材（可选，用逗号分隔）</view>
+    <input class="input" placeholder="如：辣椒,花生" value="{{excludesInput}}" bindinput="onExcludesInput"/>
+  </view>
+  <!-- 生成按钮 -->
+  <button class="generate-btn" bindtap="generateMenu" loading="{{loading}}">生成菜单</button>
+  <!-- 生成结果展示 -->
+  <view wx:if="{{recipe}}" class="result-section">
+    <view class="result-title">AI为你生成的菜单</view>
+    <image class="recipe-image" src="{{recipe.image}}" mode="aspectFit"/>
+    <view class="recipe-name">{{recipe.title}}</view>
+    <view class="recipe-desc">{{recipe.description}}</view>
+    <view class="recipe-tags">
+      <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag">{{item}}</text>
+    </view>
+    <view class="section-title">配料</view>
+    <view class="ingredients-list">
+      <text wx:for="{{recipe.ingredients}}" wx:key="*this" class="ingredient">{{item}}</text>
+    </view>
+    <view class="section-title">步骤</view>
+    <view class="steps-list">
+      <view wx:for="{{recipe.steps}}" wx:key="*this" class="step">{{index+1}}. {{item}}</view>
+    </view>
+    <view class="recipe-info">
+      <text>用时：{{recipe.cookingTime}}分钟</text>
+      <text>难度：{{recipe.difficulty}}</text>
+      <text>👍{{recipe.likes}} 👁️{{recipe.views}}</text>
+    </view>
+  </view>
+  <!-- 错误提示 -->
+  <view wx:if="{{errorMsg}}" class="error-msg">{{errorMsg}}</view>
+</view>

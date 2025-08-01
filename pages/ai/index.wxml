@@ -2,27 +2,24 @@
   <!-- 每日推荐 -->
   <view class="section">
     <view class="section-title">今日推荐</view>
-    <scroll-view scroll-x class="recipe-scroll">
+    <scroll-view scroll-x="true" class="recipe-scroll" show-scrollbar="false">
       <view class="recipe-list">
         <view class="recipe-item" wx:for="{{dailyRecipes}}" wx:key="id" bindtap="jumpToDetail" data-id="{{item.id}}">
-          <image src="{{item.image}}" mode="aspectFill"></image>
+          <image src="{{item.image}}" mode="aspectFill" class="recipe-item-image"></image>
           <view class="recipe-name">{{item.name}}</view>
         </view>
       </view>
     </scroll-view>
   </view>
 
-
-
   <!-- 个性化推荐 -->
   <view class="section">
     <view class="section-title">为您推荐</view>
     <view class="recipe-grid">
       <view class="recipe-card" wx:for="{{personalizedRecipes}}" wx:key="id" bindtap="jumpToDetail" data-id="{{item.id}}">
-        <image src="{{item.image}}" mode="aspectFill"></image>
+        <image src="{{item.image}}" mode="aspectFill" class="card-image"></image>
         <view class="recipe-info">
           <view class="recipe-name">{{item.name}}</view>
-          <view class="recipe-desc">{{item.description}}</view>
         </view>
       </view>
     </view>
@@ -46,12 +43,12 @@
   </view>
 
   <!-- 语音助手 -->
-  <view class="section">
+  <!--<view class="section">
     <view class="section-title">语音助手</view>
     <view class="voice-box">
       <image src="/image/yuyin.png" class="voice-icon {{isRecording ? 'recording' : ''}}" 
              bindtouchstart="startVoiceInput" bindtouchend="stopVoiceInput"></image>
       <view class="voice-tip">{{isRecording ? '松开结束' : '按住说话'}}</view>
     </view>
-  </view>
+  </view>-->
 </view>

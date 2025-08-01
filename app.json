@@ -7,7 +7,10 @@
     "pages/category/index",
     "pages/list/index",
     "pages/search/index",
-    "pages/ai/index"
+    "pages/ai/index",
+    "pages/ai/menu",
+    "pages/ai/result",
+    "pages/settings/index"
   ],
   "tabBar": {
     "color": "#666",
@@ -16,7 +19,7 @@
     "backgroundColor": "#fafafa",
     "list": [{
       "pagePath": "pages/index/index",
-      "text": "推荐",
+      "text": "首页",
       "iconPath": "image/home_black.png",
       "selectedIconPath": "image/home.png"
     },{

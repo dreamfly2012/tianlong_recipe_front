@@ -1,12 +1,59 @@
 // AI 相关的 mock 数据
+const dailyRecipes= [{
+  id: 1,
+  name: '西班牙海鲜饭',
+  image: '/mock/images/paella.jpeg',
+  description: '西班牙美食'
+},{
+  id: 2,
+  name: '清炒小白菜',
+  image: '/mock/images/qingchaoxiaobaicai.jpeg',
+  description: '营养健康的素菜'
+}, {
+  id: 3,
+  name: '西班牙海鲜饭2',
+  image: '/mock/images/paella.jpeg',
+  description: '西班牙美食'
+},{
+  id:4,
+  name: '红烧排骨',
+  image: '/mock/images/hongshaopaigu.jpg',
+  description: '美味可口的红烧排骨'
+},{
+  id: 5,
+  name: '西班牙海鲜饭3',
+  image: '/mock/images/paella.jpeg',
+  description: '西班牙美食'
+}];
 
+
+const personalizedRecipes= [{
+  id: 1,
+  name: '糖醋里脊',
+  image: '/mock/images/tangculiji.webp',
+  description: '外酥里嫩，酸甜可口'
+}, {
+  id: 2,
+  name: '水煮鱼',
+  image: '/mock/images/hongshaopaigu.jpg',
+  description: '麻辣鲜香的川菜代表'
+}, {
+  id: 3,
+  name: '蒜蓉炒菜心',
+  image: '/mock/images/suanrongchaocaixin.jpeg',
+  description: '清淡爽口的快手菜'
+}]
+
+
+
+//图片采用绝对地址/开头
 // AI 生成的食谱示例
 const aiGeneratedRecipes = [
   {
     id: 101,
     title: '香煎三文鱼配芦笋',
     description: 'AI 根据您的喜好生成的健康低脂食谱',
-    image: 'https://example.com/ai-recipes/salmon.jpg',
+    image: '/mock/images/xiangijansanwenyulusun.jpg',
     ingredients: ['三文鱼', '芦笋', '橄榄油', '柠檬', '盐', '黑胡椒'],
     steps: [
       '三文鱼洗净，用厨房纸吸干水分',
@@ -18,15 +65,13 @@ const aiGeneratedRecipes = [
     ],
     cookingTime: 15,
     difficulty: '简单',
-    tags: ['海鲜', '低脂', 'AI生成'],
-    likes: 456,
-    views: 1234
+    tags: ['海鲜', '低脂', 'AI生成']
   },
   {
     id: 102,
     title: '藜麦蔬菜沙拉',
     description: 'AI 推荐的营养均衡素食料理',
-    image: 'https://example.com/ai-recipes/quinoa-salad.jpg',
+    image: '/mock/images/limaishala.jpg',
     ingredients: ['藜麦', '黄瓜', '番茄', '鳄梨', '柠檬汁', '橄榄油', '盐'],
     steps: [
       '藜麦煮熟，冷却',
@@ -37,9 +82,7 @@ const aiGeneratedRecipes = [
     ],
     cookingTime: 20,
     difficulty: '简单',
-    tags: ['素食', '沙拉', '健康', 'AI生成'],
-    likes: 345,
-    views: 987
+    tags: ['素食', '沙拉', '健康', 'AI生成']
   }
 ];
 
@@ -53,6 +96,23 @@ const aiIngredientRecommendations = {
 
 // Mock API 响应数据
 const mockData = {
+  // 每日推荐菜谱
+  '/api/ai/daily-recommend': () => {
+    return {
+      code: 0,
+      msg: 'success',
+      data: dailyRecipes
+    };
+  },
+  // 个性化推荐
+  '/api/ai/personalized-recommend': () => {
+    return {
+      code: 0,
+      msg: 'success',
+      data: personalizedRecipes
+    };
+  },
+  
   // AI 生成食谱
   '/api/ai/generate-recipe': (options) => {
     const { ingredients = [], preferences = [], excludes = [] } = options.data || {};

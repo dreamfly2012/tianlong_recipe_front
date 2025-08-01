@@ -11,15 +11,15 @@
  
   <!--分类导航栏-->
   <scroll-view class='left-navbar' scroll-y="true">
-    <view wx:for="{{cateItems}}" class="{{ curNav == item.cate_id ? 'active' : '' }}" wx:key="unique" bindtap="switchRightTab" data-id="{{item.cate_id}}" data-index="{{index}}">{{item.cate_name}}
+    <view wx:for="{{categoryItems}}" class="{{ curNav == item.category_id ? 'active' : '' }}" wx:key="unique" bindtap="switchRightTab" data-id="{{item.category_id}}" data-index="{{index}}">{{item.category_name}}
     </view>
   </scroll-view>
  
   <scroll-view id="right" scroll-y="true" scroll-top="{{scrollTop}}">
-    <!--顶部图片-->
+    <!-- 顶部图片
     <view class="goods-banner">
       <image class="img-banner" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1879717261,2278189813&fm=26&gp=0.jpg" wx:if="{{}}" mode="scaleToFill"></image>
-    </view>
+    </view> -->
 
 
     <!--类别-->
@@ -27,15 +27,15 @@
       <view class="goods-title" bindtap="jumplist" data-category_id="{{item.category_id}}">{{item.name}}</view>
     </view>
  
-    <!--
-    <view class="goods-list">
+    
+    <!-- <view class="goods-list">
       <view class="goods-title">新鲜蔬菜</view>
       <view class="goods">
-        <image class="img" src="../../img/prudoct1.jpg"></image>
+        <image class="img" src="/mock/images/10003.jpeg"></image>
         <text>葵花籽清油</text>
       </view>
-    </view>
-    -->
+    </view> -->
+    
  
   </scroll-view>
  

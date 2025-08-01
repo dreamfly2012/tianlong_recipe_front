@@ -113,6 +113,99 @@ const recipeDetails = {
       { user: '懒人厨房', content: '真的很简单，味道还不错', time: '2023-06-01' },
       { user: '小白学做饭', content: '第一次做就成功了，谢谢分享', time: '2023-05-28' }
     ]
+  },
+  3: {
+    id: 3,
+    title: '鸡翅',
+    description: '巨好吃的美食',
+    image: '/mock/images/10003.jpeg',
+    ingredients: [
+      { name: '西红柿', qty: '2个' },
+      { name: '鸡蛋', qty: '3个' },
+      { name: '葱', qty: '适量' },
+      { name: '盐', qty: '适量' },
+      { name: '糖', qty: '少许' },
+      { name: '食用油', qty: '适量' }
+    ],
+    directions: [
+      { step: 1, description: '西红柿洗净切块，葱切段' },
+      { step: 2, description: '鸡蛋打散，加少许盐调味' },
+      { step: 3, description: '热锅倒油，倒入蛋液炒至金黄盛出' },
+      { step: 4, description: '锅中再加少量油，放入西红柿翻炒出汁' },
+      { step: 5, description: '加入盐和糖调味' },
+      { step: 6, description: '倒入炒好的鸡蛋，翻炒均匀即可' }
+    ],
+    cookingTime: 15,
+    difficulty: '简单',
+    tags: ['家常菜', '快手菜', '素菜'],
+    likes: 2048,
+    views: 9876,
+    comments: [
+      { user: '懒人厨房', content: '真的很简单，味道还不错', time: '2023-06-01' },
+      { user: '小白学做饭', content: '第一次做就成功了，谢谢分享', time: '2023-05-28' }
+    ]
+  },
+  4: {
+    id: 4,
+    title: '西红柿炒鸡蛋',
+    description: '简单美味的家常菜',
+    image: '/mock/images/10004.jpeg',
+    ingredients: [
+      { name: '西红柿', qty: '2个' },
+      { name: '鸡蛋', qty: '3个' },
+      { name: '葱', qty: '适量' },
+      { name: '盐', qty: '适量' },
+      { name: '糖', qty: '少许' },
+      { name: '食用油', qty: '适量' }
+    ],
+    directions: [
+      { step: 1, description: '西红柿洗净切块，葱切段' },
+      { step: 2, description: '鸡蛋打散，加少许盐调味' },
+      { step: 3, description: '热锅倒油，倒入蛋液炒至金黄盛出' },
+      { step: 4, description: '锅中再加少量油，放入西红柿翻炒出汁' },
+      { step: 5, description: '加入盐和糖调味' },
+      { step: 6, description: '倒入炒好的鸡蛋，翻炒均匀即可' }
+    ],
+    cookingTime: 15,
+    difficulty: '简单',
+    tags: ['家常菜', '快手菜', '素菜'],
+    likes: 2048,
+    views: 9876,
+    comments: [
+      { user: '懒人厨房', content: '真的很简单，味道还不错', time: '2023-06-01' },
+      { user: '小白学做饭', content: '第一次做就成功了，谢谢分享', time: '2023-05-28' }
+    ]
+  },
+  5: {
+    id: 5,
+    title: '西红柿炒鸡蛋',
+    description: '简单美味的家常菜',
+    image: '/mock/images/10005.jpeg',
+    ingredients: [
+      { name: '西红柿', qty: '2个' },
+      { name: '鸡蛋', qty: '3个' },
+      { name: '葱', qty: '适量' },
+      { name: '盐', qty: '适量' },
+      { name: '糖', qty: '少许' },
+      { name: '食用油', qty: '适量' }
+    ],
+    directions: [
+      { step: 1, description: '西红柿洗净切块，葱切段' },
+      { step: 2, description: '鸡蛋打散，加少许盐调味' },
+      { step: 3, description: '热锅倒油，倒入蛋液炒至金黄盛出' },
+      { step: 4, description: '锅中再加少量油，放入西红柿翻炒出汁' },
+      { step: 5, description: '加入盐和糖调味' },
+      { step: 6, description: '倒入炒好的鸡蛋，翻炒均匀即可' }
+    ],
+    cookingTime: 15,
+    difficulty: '简单',
+    tags: ['家常菜', '快手菜', '素菜'],
+    likes: 2048,
+    views: 9876,
+    comments: [
+      { user: '懒人厨房', content: '真的很简单，味道还不错', time: '2023-06-01' },
+      { user: '小白学做饭', content: '第一次做就成功了，谢谢分享', time: '2023-05-28' }
+    ]
   }
   // 其他食谱详情可以按需添加
 };
@@ -158,6 +251,7 @@ const mockData = {
   
   // 获取食谱详情
   '/api/recipe/detail': (options) => {
+    console.log("options",options)
     const { id } = options.data || {};
     
     if (!id || !recipeDetails[id]) {

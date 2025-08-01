@@ -10,15 +10,105 @@
   font-size:20pt;
   display: block;
 }
+.title view::before{
+  content: '';
+  position: absolute;
+  left: 8rpx;
+  transform: translateY(20%);
+  width: 8rpx;
+  height: 50rpx;
+  background: #fb0;
+  border-radius: 4rpx;
+}
 
 .view_group{
     width:100%;
 }
-.view_group view{
-    min-height:20pt;
-    margin:10pt;
-    line-height:20pt;
-    padding:5pt 10pt;
-    border:2px solid #ddd;
 
+.recipe-list{
+   padding:20rpx;
+   border:1rpx solid #fb0;
+   margin:10rpx;
+   display: flex;
+}
+
+.recipe-list .recipe-amount{
+  flex:1;
+  margin-left:20rpx;
+}
+
+.recipe-list .recipe-title {
+  flex:1;
+  margin-left:20rpx;
+  border-right: 1rpx solid #fb0;
+}
+.recipe-steps{
+  flex-direction: column;
+}
+.recipe-steps view{
+  flex:5;
+}
+
+.bottom{
+  margin:50rpx 0;
+  text-align: center;
+}
+
+.error-tip {
+  color: #f44;
+  text-align: center;
+  margin: 40rpx 0;
+  font-size: 32rpx;
+}
+
+/* 收藏按钮样式优化 */
+.recipe-header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+}
+.recipe-image{
+  width:100%;
+}
+
+.recipe-name {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 10px;
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.favorite-btn.active {
+    background-color: #ffecb3;
+}
+
+.favorite-icon {
+    color: #ccc;
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+.favorite-btn.active .favorite-icon {
+    color: #ff4d4f;
+}
+
+.favorite-text {
+    font-size: 14px;
+    color: #666;
+}
+
+.favorite-btn.active .favorite-text {
+    color: #ff4d4f;
 }

@@ -21,7 +21,7 @@ Page({
       // api params
       page:page
     }).then(res => {
-      let recipes = res.data.list || [];
+      let recipes = res.data || [];
       if(recipes.length==0){
         wx.showToast({
           title: '没有更多数据了',
@@ -42,7 +42,6 @@ Page({
   jumpdetail: function (e) {
     console.log(e)
     let id = e.currentTarget.dataset.id;
-    app.requestid = id;
 
     wx.navigateTo({
       url: '/pages/info/info?id=' + id

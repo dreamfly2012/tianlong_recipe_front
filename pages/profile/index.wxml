@@ -2,31 +2,63 @@
   <!-- 用户信息区域 -->
   <view class="user-info-section">
     <block wx:if="{{!hasUserInfo}}">
-      <button class="login-btn" bindtap="getUserProfile">登录</button>
+      <!-- 未登录状态 -->
+      <view class="user-info-placeholder">
+        <image class="avatar-placeholder" src="/image/profile.png"></image>
+        <view class="login-tip">登录以使用更多功能</view>
+        <button 
+          class="login-btn" 
+          bindtap="handleLogin" 
+          loading="{{isLoading}}"
+          hover-class="btn-hover">
+          微信一键登录
+        </button>
+      </view>
     </block>
     <block wx:else>
+      <!-- 已登录状态 -->
       <view class="user-info">
         <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        <text class="nickname">{{userInfo.nickName}}</text>
+        <view class="user-detail">
+          <view class="nickname">{{userInfo.nickName}}</view>
+          <view class="logout-btn" bindtap="handleLogout">退出登录</view>
+        </view>
       </view>
     </block>
   </view>
 
-  <!-- 收藏列表区域 -->
-  <view class="favorites-section">
+  <!-- 功能区域 -->
+  <!-- <view class="feature-section" wx:if="{{hasUserInfo}}">
+    <view class="menu-list">
+      <view class="menu-item" bindtap="goToSettings">
+        <view class="menu-icon">⚙️</view>
+        <view class="menu-text">个人设置</view>
+        <view class="menu-arrow">></view>
+      </view>
+    </view>
+  </view> -->
+
+  <!-- 收藏区域 -->
+  <view class="feature-section">
     <view class="section-title">我的收藏</view>
+    
+    <!-- 收藏列表 -->
     <view class="favorites-list">
       <block wx:if="{{favorites.length > 0}}">
-        <view class="recipe-item" wx:for="{{favorites}}" wx:key="id" bindtap="jumpToDetail" data-id="{{item.id}}">
-          <image class="recipe-image" src="{{item.image_url}}" mode="aspectFill"></image>
-          <view class="recipe-info">
-            <text class="recipe-name">{{item.name}}</text>
-            <text class="recipe-desc">{{item.description}}</text>
-          </view>
+        <view 
+          class="favorite-item" 
+          wx:for="{{favorites}}" 
+          wx:key="id"
+          bindtap="goToRecipeDetail"
+          data-id="{{item.id}}">
+          <image class="favorite-image" src="{{item.image}}" mode="aspectFill"></image>
+          <view class="favorite-name">{{item.name}}</view>
         </view>
       </block>
       <block wx:else>
-        <view class="empty-tip">暂无收藏的菜谱</view>
+        <view class="empty-favorites">
+          <text>暂无收藏的菜谱</text>
+        </view>
       </block>
     </view>
   </view>

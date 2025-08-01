@@ -1,0 +1,25 @@
+<view class="result-detail-container">
+  <view wx:if="{{!recipe}}" class="error-msg">未获取到菜谱信息</view>
+  <view wx:elif="{{recipe}}">
+    <view class="card">
+      <image class="recipe-image" src="{{recipe.image}}" mode="aspectFit"/>
+      <view class="recipe-title">{{recipe.title}}</view>
+      <view class="recipe-desc">{{recipe.description}}</view>
+      <view class="recipe-tags">
+        <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag">{{item}}</text>
+      </view>
+      <view class="section-title">配料</view>
+      <view class="ingredients-list">
+        <text wx:for="{{recipe.ingredients}}" wx:key="*this" class="ingredient">{{item}}</text>
+      </view>
+      <view class="section-title">步骤</view>
+      <view class="steps-list">
+        <view wx:for="{{recipe.steps}}" wx:key="*this" class="step">{{index+1}}. {{item}}</view>
+      </view>
+      <view class="recipe-info">
+        <text>用时：{{recipe.cookingTime}}分钟</text>
+        <text>难度：{{recipe.difficulty}}</text>
+      </view>
+    </view>
+  </view>
+</view> 

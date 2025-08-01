@@ -24,19 +24,52 @@ Page({
       let items = [];
       for (let i = 0; i < categories.length; i++) {
         let info = {};
-        info.cate_id = categories[i].category_id;
-        info.cate_name = categories[i].name;
+        info.category_id = categories[i].id;
+        info.category_name = categories[i].name;
         info.ishaveChild = false;
         info.children = [];
         items.push(info);
       }
       this.setData({
-        cateItems: items
+        categoryItems: items,
+        curNav: 1,  // 默认选中川菜（假设ID为1）
+        curIndex: 0 // 默认选中第一个分类
       })
+      
+      // 默认加载川菜的子分类
+      this.loadSubcategories(1);
     }).catch(error => {
       console.error('获取分类失败:', error)
       wx.showToast({
         title: '获取分类失败',
+        icon: 'none'
+      })
+    })
+  },
+  
+  // 加载子分类的方法
+  loadSubcategories: function(parentId) {
+    getCategories({
+      parent_id: parentId
+    }).then(res => {
+      let categories = res.data;
+      if (categories && categories.length > 0) {
+        this.setData({
+          children: categories
+        })
+      } else {
+        this.setData({
+          children: []
+        })
+        wx.showToast({
+          title: '暂无子分类',
+          icon: 'none'
+        })
+      }
+    }).catch(error => {
+      console.error('获取子分类失败:', error)
+      wx.showToast({
+        title: '获取子分类失败',
         icon: 'none'
       })
     })
@@ -123,6 +156,7 @@ Page({
   switchRightTab: function(e) {
     let id = e.currentTarget.dataset.id;
     let index = e.currentTarget.dataset.index;
+    console.log(id,index)
     this.setData({
       curNav: id,
       curIndex: index

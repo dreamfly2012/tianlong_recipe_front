@@ -3,7 +3,7 @@ import {request} from '../utils/util.js'
 
 export function getRecipes(data) {
   return request({
-    url: `/api/recipes`,
+    url: `/api/recipe.lists`,
     method: 'get',
     data
   })
@@ -11,7 +11,7 @@ export function getRecipes(data) {
 
 export function getRecipe(id){
   return request({
-    url: `/api/recipe/detail`,
+    url: `/api/recipe.info`,
     method: 'get',
     data: {
       id: id

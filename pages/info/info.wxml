@@ -1,29 +1,38 @@
-<view class="container">
+<view class="conainter">
+
+  <view wx:if="{{loadError}}" class="error-tip">
+    菜谱不存在或已被删除
+  </view>
+
+  <view wx:else>
     <view class="recipe-header">
-        <text class="recipe-name">{{recipe.name}}</text>
+      <image class="recipe-image" mode="scaleToFill" src="{{recipe.image_src}}">
+        <view class="recipe-name">{{recipe.name}}</view>
         <view class="favorite-btn {{isFavorite ? 'active' : ''}}" bindtap="toggleFavorite">
-            <text class="favorite-icon">{{isFavorite ? '❤' : '♡'}}</text>
-            <text class="favorite-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
+          <text class="favorite-icon">♥</text>
+          <text class="favorite-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
         </view>
+      </image>
     </view>
-    <image class="recipe-image" mode="aspectFit" src="{{recipe.image}}"></image>
-    <view class="title">
+
+    <view class="view_group">
+      <view class="title">
         <view>材料</view>
-    </view>
-    <view class="view_group">
-        <view wx:for="{{recipe.ingredients}}" wx:key="item" class="">
-            {{item.name}}:{{item.qty}}
-        </view>
-    </view>
-    
-    <view class="title">
+      </view>
+      <view class="recipe-list" wx:for="{{recipe.ingredients}}" wx:key="item">
+        <view class="recipe-title">{{item.name}}</view>
+        <view class="recipe-amount">{{item.qty}}</view>
+      </view>
+      
+      <view class="title">
         <view>步骤</view>
+      </view>
+      
+      <view class="recipe-list" wx:for="{{recipe.directions}}" wx:key="item">
+        <view  class="recipe-steps">{{index+1}}. {{item.description}}</view> 
+      </view>
+
+      <view class="bottom">  到底了~ </view>
     </view>
-    
-    <view class="view_group">
-    <view wx:for="{{recipe.directions}}" wx:key="item" class="recipe_wrap">
-        {{index+1}}. {{item.description}}
-    </view>
-    </view>
-    
+  </view>
 </view>

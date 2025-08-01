@@ -7,6 +7,8 @@ const recipeMock = require('./recipe');
 const categoryMock = require('./category');
 const searchMock = require('./search');
 const aiMock = require('./ai');
+const accountMock = require('./account');
+const wechatMock = require('./wechat');
 
 // 合并所有 mock 数据
 const mockDataMap = {
@@ -14,6 +16,8 @@ const mockDataMap = {
   ...categoryMock,
   ...searchMock,
   ...aiMock,
+  ...accountMock,
+  '/api/wechat/login': wechatMock.login,
 };
 
 /**

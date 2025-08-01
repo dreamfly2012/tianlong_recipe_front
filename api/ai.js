@@ -1,19 +1,18 @@
 // AI相关接口
-
-const baseUrl = 'http://localhost:3000/api';
+import {request} from '../utils/util.js'
 
 // 获取每日推荐菜谱
 export function getDailyRecommend() {
-  return wx.request({
-    url: `${baseUrl}/ai/daily-recommend`,
+  return request({
+    url: `/api/recipe.daily`,
     method: 'GET'
   })
 }
 
 // 根据食材推荐菜谱
 export function getRecipesByIngredients(ingredients) {
-  return wx.request({
-    url: `${baseUrl}/ai/ingredients-recommend`,
+  return request({
+    url: `/api/recipe.ai`,
     method: 'POST',
     data: {
       ingredients: ingredients
@@ -23,17 +22,17 @@ export function getRecipesByIngredients(ingredients) {
 
 // 获取个性化推荐
 export function getPersonalizedRecommend() {
-  return wx.request({
-    url: `${baseUrl}/ai/personalized-recommend`,
+  return request({
+    url: `/api/ai/personalized-recommend`,
     method: 'GET'
   })
 }
 
 // 获取智能菜单规划
-export function getMealPlan(preferences) {
-  return wx.request({
-    url: `${baseUrl}/ai/meal-plan`,
+export function getGenerateRecipe(data) {
+  return request({
+    url: `/api/ai/generate-recipe`,
     method: 'POST',
-    data: preferences
+    data: data
   })
 }

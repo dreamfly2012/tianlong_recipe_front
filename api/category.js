@@ -3,7 +3,7 @@ import {request} from '../utils/util.js'
 
 export function getCategories(data) {
   return request({
-    url: `/api/categories`,
+    url: `/api/recipe.category`,
     method: 'get',
     data
   })
