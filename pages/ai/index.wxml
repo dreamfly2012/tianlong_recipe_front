@@ -1,54 +1,59 @@
-<view class="container">
-  <!-- 每日推荐 -->
-  <view class="section">
-    <view class="section-title">今日推荐</view>
-    <scroll-view scroll-x="true" class="recipe-scroll" show-scrollbar="false">
-      <view class="recipe-list">
-        <view class="recipe-item" wx:for="{{dailyRecipes}}" wx:key="id" bindtap="jumpToDetail" data-id="{{item.id}}">
-          <image src="{{item.image}}" mode="aspectFill" class="recipe-item-image"></image>
-          <view class="recipe-name">{{item.name}}</view>
-        </view>
-      </view>
-    </scroll-view>
+<!--ai/index.wxml-->
+<view class="ai-page">
+
+  <!-- 头部 -->
+  <view class="hero">
+    <view class="hero-title">AI 智能美食助手</view>
+    <view class="hero-sub">懂你的口味，更懂你的厨房</view>
   </view>
 
-  <!-- 个性化推荐 -->
+  <!-- 今日推荐：横向滚动 -->
   <view class="section">
-    <view class="section-title">为您推荐</view>
-    <view class="recipe-grid">
-      <view class="recipe-card" wx:for="{{personalizedRecipes}}" wx:key="id" bindtap="jumpToDetail" data-id="{{item.id}}">
-        <image src="{{item.image}}" mode="aspectFill" class="card-image"></image>
-        <view class="recipe-info">
-          <view class="recipe-name">{{item.name}}</view>
+    <view class="section-title">今日推荐</view>
+    <scroll-view scroll-x="true" class="recipe-scroll" wx:if="{{dailyRecipes.length}}">
+      <view class="recipe-item" wx:for="{{dailyRecipes}}" wx:key="id"
+            bindtap="jumpDetail" data-id="{{item.id}}">
+        <image class="recipe-item-image" src="{{item.image_src}}" mode="aspectFill"></image>
+        <view class="recipe-name ellipsis">{{item.name}}</view>
+      </view>
+    </scroll-view>
+    <view class="skeleton-row" wx:elif="{{loadingDaily}}">
+      <view class="skeleton recipe-skel" wx:for="{{3}}" wx:key="*this"></view>
+    </view>
+    <view class="empty" wx:else>
+      <view class="text">登录后查看专属推荐</view>
+    </view>
+  </view>
+
+  <!-- 为你推荐：网格 -->
+  <view class="section">
+    <view class="section-title">为你推荐</view>
+    <view class="recipe-grid" wx:if="{{personalizedRecipes.length}}">
+      <view class="recipe-card" wx:for="{{personalizedRecipes}}" wx:key="id"
+            bindtap="jumpDetail" data-id="{{item.id}}">
+        <image class="cover" src="{{item.image_src}}" mode="aspectFill"></image>
+        <view class="body">
+          <view class="name ellipsis-2">{{item.name}}</view>
         </view>
       </view>
+    </view>
+    <view class="skeleton-grid" wx:elif="{{loadingPersonal}}">
+      <view class="skeleton recipe-skel" wx:for="{{4}}" wx:key="*this"></view>
+    </view>
+    <view class="empty" wx:else>
+      <view class="text">暂无推荐，去生成专属菜单吧</view>
     </view>
   </view>
 
   <!-- 智能菜单 -->
   <view class="section">
-    <view class="section-title">智能菜单</view>
-    <button class="function-btn" bindtap="generateMealPlan">生成今日菜单</button>
-    <view class="meal-plan" wx:if="{{mealPlan}}">
-      <view class="meal-item" wx:for="{{mealPlan.meals}}" wx:key="index">
-        <view class="meal-time">{{item.time}}</view>
-        <view class="meal-recipes">
-          <view class="recipe-link" wx:for="{{item.recipes}}" wx:for-item="recipe" wx:key="id"
-                bindtap="jumpToDetail" data-id="{{recipe.id}}">
-            {{recipe.name}}
-          </view>
-        </view>
+    <view class="menu-card" bindtap="goMenu">
+      <view class="menu-card-text">
+        <view class="menu-card-title">🍱 智能菜单规划</view>
+        <view class="menu-card-sub">告诉我你的食材与偏好，生成一周不重样的菜单</view>
       </view>
+      <view class="menu-card-btn">去生成</view>
     </view>
   </view>
 
-  <!-- 语音助手 -->
-  <!--<view class="section">
-    <view class="section-title">语音助手</view>
-    <view class="voice-box">
-      <image src="/image/yuyin.png" class="voice-icon {{isRecording ? 'recording' : ''}}" 
-             bindtouchstart="startVoiceInput" bindtouchend="stopVoiceInput"></image>
-      <view class="voice-tip">{{isRecording ? '松开结束' : '按住说话'}}</view>
-    </view>
-  </view>-->
 </view>

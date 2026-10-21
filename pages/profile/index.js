@@ -2,6 +2,7 @@
 const wechatApi = require('../../api/wechat');
 const authUtils = require('../../utils/auth');
 const accountApi = require("../../api/account")
+const { normalizeRecipes } = require("../../utils/image")
 
 Page({
   /**
@@ -55,10 +56,27 @@ Page({
    * 加载收藏的菜谱
    */
   loadFavorites: function() {
-    const favorites = accountApi.getFavorites(1)
-    console.log(favorites)
-    this.setData({
-      favorites: favorites
+    // 未登录时不调用需鉴权接口，避免触发强制登录循环跳转
+    if (!wx.getStorageSync('token')) {
+      this.setData({ favorites: [] });
+      return;
+    }
+    accountApi.getFavorites(1).then(result => {
+      // 兼容多种返回结构：{ data: { data: [] } } / { data: [] } / []
+      let favorites = [];
+      if (result && result.data) {
+        if (Array.isArray(result.data)) {
+          favorites = result.data;
+        } else if (Array.isArray(result.data.data)) {
+          favorites = result.data.data;
+        } else if (Array.isArray(result.data.list)) {
+          favorites = result.data.list;
+        }
+      }
+      console.log("favorites", favorites);
+      this.setData({ favorites: normalizeRecipes(favorites) });
+    }).catch(err => {
+      console.log("Error:", err);
     });
   },
 
@@ -92,17 +110,25 @@ Page({
               }).then(res => {
                 console.log('后端登录接口返回:', res);
                 
-                // 检查返回的数据结构
+                // 检查返回的数据结构：request 约定 resolve 出完整 res.data，
+                // 后端 wechatLogin 返回 { code:0, data:{ token, user, ... }, msg }
                 if (res.code === 0 || res.authenticated === true) {
-                  // 4. 保存登录信息
+                  // 4. 保存登录信息（token 与 user 都在 res.data 下）
                   const token = res.data?.token || res.token;
-                  const userInfo = res.user || profileRes.userInfo;
-                  
+                  // 后端 user 对象头像字段为 wechat_avatar，前端统一为 avatarUrl
+                  const rawUser = res.data?.user || res.user || profileRes.userInfo;
+                  const userInfo = {
+                    ...rawUser,
+                    nickName: rawUser.wechat_nickname || rawUser.nickName || rawUser.name || profileRes.userInfo?.nickName || '',
+                    avatarUrl: rawUser.wechat_avatar || rawUser.avatarUrl || profileRes.userInfo?.avatarUrl || '/image/profile.png',
+                    gender: rawUser.gender || 0
+                  };
+
                   if (!token) {
                     this.handleLoginError('登录失败: 未获取到有效的登录凭证');
                     return;
                   }
-                  
+
                   wechatApi.saveLoginInfo({
                     token: token,
                     userInfo: userInfo
@@ -216,12 +242,19 @@ Page({
     }).then(res => {
       console.log('备用方案登录返回:', res);
       
-      // 检查返回的数据结构
+      // 检查返回的数据结构（token 与 user 都在 res.data 下）
       if (res.code === 0 || res.authenticated === true) {
         // 保存登录信息
         const token = res.data?.token || res.token;
-        const userInfo = res.user || defaultUserInfo;
-        
+        // 后端 user 对象头像字段为 wechat_avatar，前端统一为 avatarUrl
+        const rawUser = res.data?.user || res.user || defaultUserInfo;
+        const userInfo = {
+          ...rawUser,
+          nickName: rawUser.wechat_nickname || rawUser.nickName || rawUser.name || defaultUserInfo.nickName,
+          avatarUrl: rawUser.wechat_avatar || rawUser.avatarUrl || defaultUserInfo.avatarUrl,
+          gender: rawUser.gender || defaultUserInfo.gender || 0
+        };
+
         if (!token) {
           this.handleLoginError('登录失败: 未获取到有效的登录凭证');
           return;
@@ -297,8 +330,18 @@ Page({
    */
   goToRecipeDetail: function(e) {
     const id = e.currentTarget.dataset.id;
+    console.log('[profile] goToRecipeDetail 触发, id =', id)
+    if (!id) {
+      console.warn('[profile] goToRecipeDetail 失败：收藏数据缺少 id 字段')
+      wx.showToast({ title: '菜谱信息缺失', icon: 'none' })
+      return
+    }
     wx.navigateTo({
-      url: '/pages/info/info?id=' + id
+      url: '/pages/info/info?id=' + id,
+      fail: (err) => {
+        console.error('[profile] 跳转详情页失败：', err)
+        wx.showToast({ title: '跳转失败，请重试', icon: 'none' })
+      }
     });
   },
   

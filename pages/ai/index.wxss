@@ -1,212 +1,116 @@
-.container {
-  padding: 0;
-  background: #f7f8fa;
+/* ai/index.wxss */
+.ai-page {
   min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 40rpx;
+}
+
+/* 头部 */
+.hero {
+  background: linear-gradient(135deg, #6A5CFF 0%, #8E54E9 100%);
+  padding: 44rpx 32rpx 56rpx;
+  border-bottom-left-radius: 36rpx;
+  border-bottom-right-radius: 36rpx;
+}
+.hero-title {
+  color: #fff;
+  font-size: 44rpx;
+  font-weight: 800;
+}
+.hero-sub {
+  color: rgba(255,255,255,0.9);
+  font-size: 26rpx;
+  margin-top: 8rpx;
 }
 
 .section {
-  margin: 0 0 24rpx 0;
-  width: 100%;
-  background: #fff;
-  border-radius: 0;
-  padding: 0 0 24rpx 0;
-  box-shadow: none;
-  overflow: visible;
+  padding: 28rpx 24rpx 4rpx;
 }
 
-.section-title {
-  font-size: 34rpx;
-  font-weight: 700;
-  margin-bottom: 12rpx;
-  color: #222;
-  position: relative;
-  padding: 28rpx 0 0 24rpx;
-  background: transparent;
-}
-.section-title::before {
-  content: '';
-  position: absolute;
-  left: 8rpx;
-  transform: translateY(20%);
-  width: 8rpx;
-  height: 30rpx;
-  background: #ff6b6b;
-  border-radius: 4rpx;
-}
-
-/* 每日推荐横向滚动 */
+/* 横向滚动 */
 .recipe-scroll {
-  width: 100vw;
-  overflow-x: scroll;
   white-space: nowrap;
-  padding-bottom: 8rpx;
-  box-sizing: border-box;
-  margin-left: 0;
-  margin-right: 0;
 }
-
-.recipe-list {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  padding-left: 8rpx;
-}
-
 .recipe-item {
-  margin-right: 12rpx;
-  width: 220rpx;
-  flex-shrink: 0;
-  background: #fff;
-  border-radius: 10rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.04);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 0 10rpx 0;
-  transition: box-shadow 0.2s;
-}
-.recipe-item:last-child {
-  margin-right: 0;
-}
-.recipe-item:active {
-  box-shadow: 0 2rpx 18rpx rgba(255,107,107,0.13);
-}
-.recipe-item-image{
-  width: 200rpx;
-  height: 130rpx;
-  border-radius: 10rpx;
-  object-fit: cover;
-  margin-top: 10rpx;
-}
-.recipe-name {
-  font-size: 24rpx;
-  margin-top: 10rpx;
-  text-align: center;
-  color: #34495e;
-  font-weight: 500;
-  line-height: 1.2;
-  min-height: 2.2em;
-}
-
-/* 个性化推荐 */
-.recipe-grid {
-  display: grid;
-  gap: 10rpx;
-  padding: 0 4rpx;
-}
-.recipe-card {
-  background: #fff;
-  border-radius: 8rpx;
+  display: inline-block;
+  width: 240rpx;
+  margin-right: 18rpx;
+  background: var(--card);
+  border-radius: 16rpx;
   overflow: hidden;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.04);
-  transition: box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-  min-height: 140rpx;
+  box-shadow: var(--shadow);
+  vertical-align: top;
 }
-.recipe-card:active {
-  box-shadow: 0 2rpx 18rpx rgba(255,107,107,0.13);
-}
-.card-image {
-  width: 100%;
-  height: 400rpx;
-  object-fit: cover;
-}
-.recipe-info {
-  padding: 8rpx 6rpx 8rpx 6rpx;
-}
-.recipe-card .recipe-name {
-  font-size: 20rpx;
-  color: #222;
-  font-weight: 600;
-  margin-bottom: 2rpx;
-  min-height: 2em;
-}
-.recipe-desc {
-  font-size: 18rpx;
-  color: #888;
-  line-height: 1.5;
-}
-
-/* 智能菜单 */
-.function-btn {
-  background: linear-gradient(90deg, #ff6b6b 0%, #ffb86b 100%);
-  color: #fff;
-  font-size: 24rpx;
-  padding: 10rpx 0;
-  border-radius: 8rpx;
-  margin: 0 12rpx 8rpx 12rpx;
-  font-weight: 600;
-  box-shadow: 0 2rpx 8rpx rgba(255,107,107,0.05);
-  border: none;
-  width: calc(100% - 24rpx);
+.recipe-item:active { transform: scale(0.97); }
+.recipe-item-image {
+  width: 240rpx;
+  height: 160rpx;
+  background: #EEE;
   display: block;
 }
-.function-btn:active {
-  background: #ff5252;
-}
-.meal-plan {
-  margin-top: 8rpx;
-  padding: 0 8rpx;
-}
-.meal-item {
-  margin-bottom: 8rpx;
-  padding: 8rpx 6rpx;
-  background: #f7f8fa;
-  border-radius: 8rpx;
-  box-shadow: 0 1rpx 4rpx rgba(0,0,0,0.02);
-}
-.meal-time {
-  font-size: 18rpx;
+.recipe-item .recipe-name {
+  font-size: 26rpx;
   font-weight: 600;
-  color: #ff6b6b;
-  margin-bottom: 4rpx;
-}
-.meal-recipes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6rpx;
-}
-.recipe-link {
-  font-size: 16rpx;
-  color: #ff6b6b;
-  padding: 2rpx 8rpx;
-  background: rgba(255,107,107,0.08);
-  border-radius: 4rpx;
-  transition: background 0.2s;
-}
-.recipe-link:active {
-  background: rgba(255,107,107,0.18);
+  color: var(--text);
+  padding: 14rpx 16rpx;
 }
 
-/* 语音助手 */
-.voice-box {
+/* 网格复用全局 .recipe-card */
+.recipe-card .cover {
+  width: 100%;
+  height: 220rpx;
+  background: #EEE;
+}
+
+/* 骨架屏 */
+.skeleton-row, .skeleton-grid {
   display: flex;
-  flex-direction: column;
+}
+.skeleton-row { overflow: hidden; }
+.skeleton-grid {
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.recipe-skel {
+  width: 240rpx;
+  height: 200rpx;
+  margin-right: 18rpx;
+  flex-shrink: 0;
+}
+.skeleton-grid .recipe-skel {
+  width: calc(50% - 12rpx);
+  margin-right: 0;
+  margin-bottom: 24rpx;
+}
+
+/* 智能菜单卡片 */
+.menu-card {
+  display: flex;
   align-items: center;
-  padding: 10rpx 0 6rpx 0;
-  margin: 0 8rpx;
-  background: #fff;
-  border-radius: 8rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.04);
+  justify-content: space-between;
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0C2 100%);
+  border-radius: 20rpx;
+  padding: 32rpx 28rpx;
+  box-shadow: var(--shadow);
 }
-.voice-icon {
-  width: 40rpx;
-  height: 40rpx;
-  margin-bottom: 4rpx;
-  transition: all 0.3s;
+.menu-card:active { transform: scale(0.98); }
+.menu-card-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #8A4B00;
 }
-.voice-icon.recording {
-  animation: pulse 1s infinite;
-  opacity: 0.8;
+.menu-card-sub {
+  font-size: 24rpx;
+  color: #9B6B3A;
+  margin-top: 8rpx;
+  line-height: 1.4;
 }
-.voice-tip {
-  font-size: 14rpx;
-  color: #888;
-  margin-top: 2rpx;
-}
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+.menu-card-btn {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #FF8A3D 0%, #FF6B00 100%);
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 14rpx 28rpx;
+  border-radius: 40rpx;
 }

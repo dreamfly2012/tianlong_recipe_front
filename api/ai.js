@@ -1,38 +1,48 @@
-// AI相关接口
-import {request} from '../utils/util.js'
+const { request } = require('../utils/util.js')
 
 // 获取每日推荐菜谱
-export function getDailyRecommend() {
+function getDailyRecommend() {
   return request({
-    url: `/api/recipe.daily`,
-    method: 'GET'
+    url: '/api/recipe.daily',
+    method: 'GET',
+    requiresAuth: true
   })
 }
 
 // 根据食材推荐菜谱
-export function getRecipesByIngredients(ingredients) {
+function getRecipesByIngredients(ingredients) {
   return request({
-    url: `/api/recipe.ai`,
+    url: '/api/recipe.ai',
     method: 'POST',
-    data: {
-      ingredients: ingredients
-    }
+    data: { ingredients },
+    requiresAuth: true
   })
 }
 
 // 获取个性化推荐
-export function getPersonalizedRecommend() {
+function getPersonalizedRecommend() {
   return request({
-    url: `/api/ai/personalized-recommend`,
-    method: 'GET'
+    url: '/api/recipe.personalized',
+    method: 'GET',
+    requiresAuth: true
   })
 }
 
 // 获取智能菜单规划
-export function getGenerateRecipe(data) {
+function getGenerateRecipe(data) {
   return request({
-    url: `/api/ai/generate-recipe`,
+    url: '/api/recipe.generate',
     method: 'POST',
-    data: data
+    data: data,
+    requiresAuth: true,
+    // AI 生成本就较慢，给足 60s，但绝不会无限挂起
+    timeout: 60000
   })
+}
+
+module.exports = {
+  getDailyRecommend,
+  getRecipesByIngredients,
+  getPersonalizedRecommend,
+  getGenerateRecipe
 }

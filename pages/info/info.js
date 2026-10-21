@@ -1,104 +1,88 @@
-//index.js
-//获取应用实例
+// info.js
 const app = getApp()
-
-import {
-  getRecipe
-} from '../../api/recipe.js'
-import { getFavorites, addFavorite, removeFavorite } from '../../api/account.js'
+import { getRecipe } from '../../api/recipe.js'
+import { addFavorite, removeFavorite, isUserFavorite } from '../../api/account.js'
+const { normalizeRecipe } = require('../../utils/image.js')
 
 Page({
   data: {
-    recipe: {},
+    recipe: { ingredients: [], directions: [] },
     isFavorite: false,
-    videoInfo: null, // 视频信息
-    isVideoLoading: false, // 视频加载状态
-    videoError: null, // 视频错误信息
     id: null,
-    hasUserInfo: false, // 假设添加了 hasUserInfo 字段
-    loadError:false
+    loadError: false,
+    cookingTime: '',
+    difficulty: ''
   },
 
   onLoad: function (options) {
-    let that = this;
-    this.id = options.id;
+    this.id = options.id
+    this.fetchRecipe()
+  },
 
-    // 检查是否已收藏
-    const favorites = wx.getStorageSync('favorites') || []
-    const isFavorite = favorites.includes(this.id)
-
-    // 从本地存储读取用户信息
-    const userInfo = wx.getStorageSync('userInfo');
-    if (userInfo) {
-      this.setData({
-        userInfo: userInfo,
-        hasUserInfo: true
-      });
-    } else {
-      this.setData({
-        hasUserInfo: false
-      });
-    }
-
+  fetchRecipe: function () {
     getRecipe(this.id).then(res => {
-      if(res.data && res.data.id){ 
-      that.setData({
-        recipe: res.data,
-        isFavorite
-      })
-    }else{
+      if (res.data && res.data.id) {
+        const recipe = normalizeRecipe(res.data)
         this.setData({
-          loadError:true
+          recipe: recipe,
+          cookingTime: recipe.cookingTime || '',
+          difficulty: recipe.difficulty || ''
         })
-        wx.showToast({
-          title: '获取菜谱失败',
-          icon: 'none'
-        })
+        // 已登录时同步收藏状态
+        if (wx.getStorageSync('token')) {
+          isUserFavorite(this.id).then(favRes => {
+            if (favRes && favRes.code === 0 && favRes.data) {
+              this.setData({ isFavorite: !!favRes.data.isFavorite })
+            }
+          }).catch(() => {})
+        }
+      } else {
+        this.setData({ loadError: true })
+        wx.showToast({ title: '获取菜谱失败', icon: 'none' })
       }
-      console.log('获取菜谱成功:', res.data)
-    }).catch(error => {
-      this.setData({
-        loadError:true
-      })
-      wx.showToast({
-        title: '获取菜谱失败',
-        icon: 'none'
-      })
+    }).catch(() => {
+      this.setData({ loadError: true })
+      wx.showToast({ title: '获取菜谱失败', icon: 'none' })
     })
   },
 
-  
-
-  // 收藏/取消收藏
   toggleFavorite: function () {
-    // 判断是否登录
-    if (!this.data.hasUserInfo) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      })
-      return;
+    if (!wx.getStorageSync('token')) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      setTimeout(() => wx.switchTab({ url: '/pages/profile/index' }), 1500)
+      return
     }
 
-    let favorites = wx.getStorageSync('favorites') || []
-    const id = this.id; // 或 this.data.id，按你的实际变量名
-
+    const id = this.id
     if (this.data.isFavorite) {
-      // 取消收藏
-      favorites = favorites.filter(item => item !== id)
-      wx.showToast({
-        title: '已取消收藏',
-        icon: 'success'
-      })
+      removeFavorite(id).then(res => {
+        if (res.code === 0) {
+          this.setData({ isFavorite: false })
+          wx.showToast({ title: '已取消收藏', icon: 'success' })
+        } else {
+          wx.showToast({ title: res.msg || '操作失败', icon: 'none' })
+        }
+      }).catch(() => wx.showToast({ title: '操作失败', icon: 'none' }))
     } else {
-      // 添加收藏
-      favorites.push(id)
-      wx.showToast({
-        title: '收藏成功',
-        icon: 'success'
-      })
+      addFavorite(id).then(res => {
+        if (res.code === 0) {
+          this.setData({ isFavorite: true })
+          wx.showToast({ title: '收藏成功', icon: 'success' })
+        } else {
+          wx.showToast({ title: res.msg || '操作失败', icon: 'none' })
+        }
+      }).catch(() => wx.showToast({ title: '操作失败', icon: 'none' }))
     }
-    wx.setStorageSync('favorites', favorites)
-    this.setData({ isFavorite: !this.data.isFavorite })
+  },
+
+  goBack: function () {
+    wx.navigateBack({ delta: 1 })
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: (this.data.recipe && this.data.recipe.name) || '天龙菜谱',
+      path: '/pages/info/info?id=' + this.id
+    }
   }
 })

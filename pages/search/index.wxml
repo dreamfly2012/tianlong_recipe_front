@@ -1,15 +1,44 @@
-<!--index.wxml-->
-<view class="container">
-  
-    <view wx:for="{{recipes}}" wx:key="item" class="recipe_wrap">
-    <view bindtap='jumpdetail' data-id="{{item.id}}"> 
-    
-    <image class="pic" mode="aspectFill" src="{{item.image_src}}"></image>
-    <text class="recipe_name">{{item.name}}</text>
-    
+<!--search/index.wxml-->
+<view class="search-page">
+
+  <!-- 搜索栏 -->
+  <view class="search-wrap">
+    <view class="search-bar">
+      <image class="ico" src="/image/search.png"></image>
+      <input class="input" placeholder="搜索菜谱名称"
+             value="{{keyword}}" bindinput="onSearchChange"
+             bindconfirm="onSearchConfirm" confirm-type="search" focus="{{!keyword}}" />
+      <view class="search-btn" bindtap="onSearch">搜索</view>
     </view>
+  </view>
+
+  <!-- 结果区 -->
+  <view class="result" wx:if="{{searched}}">
+    <view class="result-head" wx:if="{{recipes.length}}">
+      找到 <text class="hl">{{recipes.length}}</text> 个相关菜谱
     </view>
-    
-   
-  
+
+    <view class="recipe-grid">
+      <view class="recipe-card" wx:for="{{recipes}}" wx:key="id"
+            bindtap="jumpDetail" data-id="{{item.id}}">
+        <image class="cover" src="{{item.image_src}}" mode="aspectFill"></image>
+        <view class="body">
+          <view class="name ellipsis-2">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="list-end" wx:if="{{finished && recipes.length}}">— 已经到底啦 —</view>
+    <view class="empty" wx:if="{{!loading && searched && !recipes.length}}">
+      <view class="icon">🔍</view>
+      <view class="text">没有找到「{{keyword}}」相关的菜谱</view>
+    </view>
+  </view>
+
+  <!-- 未搜索时的引导 -->
+  <view class="empty" wx:else>
+    <view class="icon">🍜</view>
+    <view class="text">输入菜名，发现你的下一顿美食</view>
+  </view>
+
 </view>

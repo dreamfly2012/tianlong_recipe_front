@@ -1,42 +1,54 @@
-<view class="search-wrapper">
-  <view class="search-box">
-    <input placeholder="请输入菜品名称" focus="{{focus}}" bindinput="searchChange" bindconfirm="search" class="search" value="{{inputValue}}"/>
-    <image src="/image/search.png" mode="aspectFit" class="search-icon" bindtap="search"></image>
-    <view class="voice-btn {{isRecording ? 'recording' : ''}}" bindtouchstart="startVoiceInput" bindtouchend="stopVoiceInput">
-      <image src="/image/yuyin.png" mode="aspectFit" class="voice-icon"></image>
+<!--category/index.wxml-->
+<view class="cat-page">
+
+  <!-- 顶部搜索 -->
+  <view class="search-wrap">
+    <view class="search-bar">
+      <image class="ico" src="/image/search.png"></image>
+      <input class="input" placeholder="搜索你想要的菜谱"
+             value="{{inputValue}}" bindinput="onSearchChange"
+             bindconfirm="onSearchConfirm" confirm-type="search" />
+      <view class="voice-btn {{isRecording ? 'recording' : ''}}"
+            bindtouchstart="startVoiceInput" bindtouchend="stopVoiceInput">
+        <image class="voice-ico" src="/image/yuyin.png"></image>
+      </view>
     </view>
   </view>
-</view>
-<view class="classify">
- 
-  <!--分类导航栏-->
-  <scroll-view class='left-navbar' scroll-y="true">
-    <view wx:for="{{categoryItems}}" class="{{ curNav == item.category_id ? 'active' : '' }}" wx:key="unique" bindtap="switchRightTab" data-id="{{item.category_id}}" data-index="{{index}}">{{item.category_name}}
-    </view>
-  </scroll-view>
- 
-  <scroll-view id="right" scroll-y="true" scroll-top="{{scrollTop}}">
-    <!-- 顶部图片
-    <view class="goods-banner">
-      <image class="img-banner" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1879717261,2278189813&fm=26&gp=0.jpg" wx:if="{{}}" mode="scaleToFill"></image>
-    </view> -->
 
+  <!-- 双栏分类 -->
+  <view class="classify">
+    <scroll-view scroll-y="true" class="left-navbar">
+      <block wx:if="{{categories.length}}">
+        <view class="nav-item {{curNav == item.id ? 'active' : ''}}"
+              wx:for="{{categories}}" wx:key="id"
+              bindtap="switchNav" data-id="{{item.id}}">
+          {{item.name}}
+        </view>
+      </block>
+      <block wx:elif="{{loadingTop}}">
+        <view class="nav-skeleton" wx:for="{{[1,2,3,4,5,6]}}" wx:key="*this"></view>
+      </block>
+    </scroll-view>
 
-    <!--类别-->
-    <view class="goods-list" wx:for="{{children}}" wx:key="unique">
-      <view class="goods-title" bindtap="jumplist" data-category_id="{{item.category_id}}">{{item.name}}</view>
-    </view>
- 
-    
-    <!-- <view class="goods-list">
-      <view class="goods-title">新鲜蔬菜</view>
-      <view class="goods">
-        <image class="img" src="/mock/images/10003.jpeg"></image>
-        <text>葵花籽清油</text>
+    <scroll-view scroll-y="true" class="right">
+      <view class="right-title">{{curName || '子分类'}} · 子分类</view>
+      <block wx:if="{{children.length}}">
+        <view class="sub-grid">
+          <view class="sub-card" wx:for="{{children}}" wx:key="id"
+                bindtap="jumplist" data-id="{{item.id}}">
+            <view class="sub-name">{{item.name}}</view>
+          </view>
+        </view>
+      </block>
+      <block wx:elif="{{loadingChildren}}">
+        <view class="sub-grid">
+          <view class="sub-card skeleton" wx:for="{{[1,2,3,4]}}" wx:key="*this"></view>
+        </view>
+      </block>
+      <view class="empty" wx:else>
+        <view class="text">暂无子分类</view>
       </view>
-    </view> -->
-    
- 
-  </scroll-view>
- 
+    </scroll-view>
+  </view>
+
 </view>

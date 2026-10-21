@@ -81,11 +81,11 @@ const handleAuthRedirect = () => {
   if (redirectUrl) {
     wx.removeStorageSync('auth_redirect_url');
     
-    // 判断是否是 tabBar 页面
+    // 判断是否是 tabBar 页面（仅首页/分类/智能助手/我的 为 tab）
     const tabBarPages = [
       '/pages/index/index',
       '/pages/category/index',
-      '/pages/search/index',
+      '/pages/ai/index',
       '/pages/profile/index'
     ];
     

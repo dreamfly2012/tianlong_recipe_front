@@ -1,15 +1,50 @@
 <!--index.wxml-->
-<view class="container">
+<view class="home">
 
-  <view wx:for="{{recipes}}" wx:key="item" class="recipe_wrap">
-    <view bindtap='jumpdetail' data-id="{{item.id}}">
-
-      <image class="pic" mode="aspectFill" src="{{item.image_src}}"></image>
-      <text class="recipe_name">{{item.name}}</text>
-
+  <!-- 顶部品牌区 + 搜索入口 -->
+  <view class="hero">
+    <view class="brand">
+      <view class="brand-title">天龙菜谱</view>
+      <view class="brand-sub">最全最靠谱的中华菜谱</view>
+    </view>
+    <view class="search-bar" bindtap="onSearchTap">
+      <image class="ico" src="/image/search.png"></image>
+      <text class="placeholder">搜索你想要的菜谱</text>
     </view>
   </view>
 
+  <!-- 分类快捷入口 -->
+  <view class="section">
+    <view class="section-title">美食分类</view>
+    <scroll-view scroll-x="true" class="cate-scroll" wx:if="{{categories.length}}">
+      <view class="cate-chip" wx:for="{{categories}}" wx:key="id"
+            bindtap="goCategory" data-id="{{item.id}}">
+        <view class="cate-name">{{item.name}}</view>
+      </view>
+    </scroll-view>
+    <view class="empty" wx:else>
+      <view class="text">分类加载中…</view>
+    </view>
+  </view>
 
+  <!-- 热门菜谱 -->
+  <view class="section">
+    <view class="section-title">热门菜谱</view>
+
+    <view class="recipe-grid">
+      <view class="recipe-card" wx:for="{{recipes}}" wx:key="id"
+            bindtap="jumpDetail" data-id="{{item.id}}">
+        <image class="cover" src="{{item.image_src}}" mode="aspectFill"></image>
+        <view class="body">
+          <view class="name ellipsis-2">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="list-end" wx:if="{{finished && recipes.length}}">— 已经到底啦 —</view>
+    <view class="empty" wx:if="{{!loading && !recipes.length}}">
+      <view class="text">暂无菜谱</view>
+    </view>
+  </view>
 
 </view>

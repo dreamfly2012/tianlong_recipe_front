@@ -1,199 +1,172 @@
-//index.js
-//获取应用实例
+// category/index.js
 const app = getApp()
-
 import { getCategories } from '../../api/category.js'
-import { getVoiceRecommend } from '../../api/ai.js'
+
+// 本地缓存 key：一级分类 + 各父分类的子分类
+const TOP_KEY = 'cat_top_cache'
+const childKey = (id) => 'cat_children_' + id
+const readCache = (key) => {
+  try { return wx.getStorageSync(key) || [] } catch (e) { return [] }
+}
+const writeCache = (key, data) => {
+  try { wx.setStorageSync(key, data) } catch (e) {}
+}
 
 Page({
   data: {
-    cateItems: [],
-    children: [],
-    inputValue: "",
-    curNav: 1,
-    curIndex: 0,
-    isRecording: false
+    categories: [],   // 一级分类
+    children: [],     // 当前选中的子分类
+    curNav: 0,
+    curName: '',
+    inputValue: '',
+    isRecording: false,
+    loadingTop: false,        // 左侧一级分类加载中（无缓存时）
+    loadingChildren: false    // 右侧子分类加载中（无缓存时）
   },
 
-  onLoad: function (options) {
-    //获得分类筛选
-    getCategories({
-      parent_id: 0
-    }).then(res => {
-      let categories = res.data;
-      let items = [];
-      for (let i = 0; i < categories.length; i++) {
-        let info = {};
-        info.category_id = categories[i].id;
-        info.category_name = categories[i].name;
-        info.ishaveChild = false;
-        info.children = [];
-        items.push(info);
-      }
+  onLoad: function () {
+    this.loadTopCategories()
+  },
+
+  onShow: function () {
+    // 页面被销毁重建时兜底：无数据则重载（正常切 tab 不会走到这里）
+    if (!this.data.categories.length) this.loadTopCategories()
+  },
+
+  // 一级分类：缓存优先即时渲染，再后台刷新
+  loadTopCategories: function () {
+    // 1) 缓存即时出左侧导航，避免空白卡顿
+    const cached = readCache(TOP_KEY)
+    if (cached.length) {
+      const first = cached[0]
       this.setData({
-        categoryItems: items,
-        curNav: 1,  // 默认选中川菜（假设ID为1）
-        curIndex: 0 // 默认选中第一个分类
+        categories: cached,
+        curNav: first.id,
+        curName: first.name,
+        loadingTop: false
       })
-      
-      // 默认加载川菜的子分类
-      this.loadSubcategories(1);
-    }).catch(error => {
-      console.error('获取分类失败:', error)
-      wx.showToast({
-        title: '获取分类失败',
-        icon: 'none'
-      })
-    })
-  },
-  
-  // 加载子分类的方法
-  loadSubcategories: function(parentId) {
-    getCategories({
-      parent_id: parentId
-    }).then(res => {
-      let categories = res.data;
-      if (categories && categories.length > 0) {
-        this.setData({
-          children: categories
-        })
-      } else {
-        this.setData({
-          children: []
-        })
-        wx.showToast({
-          title: '暂无子分类',
-          icon: 'none'
-        })
+      // 子分类由下方后台刷新统一拉取，避免重复请求
+    } else {
+      this.setData({ loadingTop: true })
+    }
+
+    // 2) 后台请求刷新（无论有无缓存都拉一次，保持最新）
+    getCategories({ parent_id: 0 }).then(res => {
+      const cats = res.data || []
+      writeCache(TOP_KEY, cats)
+      const first = cats[0]
+      this.setData({ categories: cats, loadingTop: false })
+      if (first) {
+        // 若选中项变化则切换子分类；否则仅刷新名称
+        if (this.data.curNav !== first.id) {
+          this.setData({ curNav: first.id, curName: first.name })
+        } else {
+          this.setData({ curName: first.name })
+        }
+        this.loadChildren(first.id)
       }
-    }).catch(error => {
-      console.error('获取子分类失败:', error)
-      wx.showToast({
-        title: '获取子分类失败',
-        icon: 'none'
-      })
+    }).catch(() => {
+      this.setData({ loadingTop: false })
+      if (!this.data.categories.length) {
+        wx.showToast({ title: '获取分类失败', icon: 'none' })
+      }
     })
   },
 
-  // 开始语音输入
-  startVoiceInput: function() {
-    this.setData({ isRecording: true })
-    const plugin = requirePlugin("WechatSI")
-    const manager = plugin.getRecordRecognitionManager()
-    
-    manager.onStart = (res) => {
-      console.log('录音开始')
-      wx.showToast({
-        title: '请说话...',
-        icon: 'none',
-        duration: 60000
-      })
-    }
-    
-    manager.onStop = (res) => {
-      this.setData({ isRecording: false })
-      wx.hideToast()
-      if (res.result) {
-        console.log(res.result)
-        this.searchByVoice(res.result)
-      } else {
-        wx.showToast({
-          title: '未能识别，请重试',
-          icon: 'none'
-        })
-      }
-    }
-    
-    manager.onError = (res) => {
-      this.setData({ isRecording: false })
-      wx.hideToast()
-      console.error('语音识别错误:', res)
-      wx.showToast({
-        title: '语音识别失败，请重试',
-        icon: 'none'
-      })
-    }
-    
-    manager.start({ duration: 60000, lang: "zh_CN" })
-  },
+  // 子分类：缓存优先即时出，再后台刷新；仅当仍是当前选中项才写入，避免快速切换串数据
+  loadChildren: function (parentId) {
+    const key = childKey(parentId)
+    const cached = readCache(key)
+    const hasCache = cached.length > 0
 
-  // 停止语音输入
-  stopVoiceInput: function() {
-    const plugin = requirePlugin("WechatSI")
-    const manager = plugin.getRecordRecognitionManager()
-    manager.stop()
-  },
-
-  // 语音搜索
-  searchByVoice: function(voiceText) {
     this.setData({
-      inputValue: voiceText
+      children: hasCache ? cached : [],
+      loadingChildren: !hasCache
+    })
+
+    getCategories({ parent_id: parentId }).then(res => {
+      const list = res.data || []
+      writeCache(key, list)
+      if (this.data.curNav === parentId) {
+        this.setData({ children: list, loadingChildren: false })
+      }
+    }).catch(() => {
+      if (this.data.curNav === parentId) {
+        this.setData({ loadingChildren: false })
+      }
     })
   },
 
-  // 文字搜索
-  search: function() {
-    if (!this.data.inputValue.trim()) {
-      wx.showToast({
-        title: '请输入搜索内容',
-        icon: 'none'
-      })
+  // 切换左侧分类
+  switchNav: function (e) {
+    const id = e.currentTarget.dataset.id
+    if (id === this.data.curNav) return
+    const name = (this.data.categories.find(c => c.id === id) || {}).name || ''
+    this.setData({ curNav: id, curName: name, children: [], loadingChildren: true })
+    this.loadChildren(id)
+  },
+
+  // 搜索输入
+  onSearchChange: function (e) {
+    this.setData({ inputValue: e.detail.value })
+  },
+
+  // 点击搜索按钮 / 回车
+  onSearch: function () {
+    this.goSearch(this.data.inputValue)
+  },
+  onSearchConfirm: function (e) {
+    this.goSearch(e.detail.value)
+  },
+  goSearch: function (kw) {
+    kw = (kw || '').trim()
+    if (!kw) {
+      wx.showToast({ title: '请输入搜索内容', icon: 'none' })
       return
     }
-    wx.navigateTo({
-      url: '/pages/search/index?name=' + encodeURIComponent(this.data.inputValue)
-    })
+    wx.navigateTo({ url: '/pages/search/index?name=' + encodeURIComponent(kw) })
   },
 
-  // 搜索框输入事件
-  searchChange: function(e) {
-    this.setData({
-      inputValue: e.detail.value
-    })
+  // 点击子分类跳转列表
+  jumplist: function (e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: '/pages/list/index?category_id=' + id })
   },
 
-  // 点击分类项
-  switchRightTab: function(e) {
-    let id = e.currentTarget.dataset.id;
-    let index = e.currentTarget.dataset.index;
-    console.log(id,index)
-    this.setData({
-      curNav: id,
-      curIndex: index
-    })
-
-    // 获取子分类
-    getCategories({
-      parent_id: id
-    }).then(res => {
-      let categories = res.data;
-      if (categories && categories.length > 0) {
-        this.setData({
-          children: categories
-        })
-      } else {
-        this.setData({
-          children: []
-        })
-        wx.showToast({
-          title: '暂无子分类',
-          icon: 'none'
-        })
+  /* ---------------- 语音输入（可选） ---------------- */
+  startVoiceInput: function () {
+    this.setData({ isRecording: true })
+    try {
+      const plugin = requirePlugin('WechatSI')
+      const manager = plugin.getRecordRecognitionManager()
+      manager.onStart = () => {
+        wx.showToast({ title: '请说话…', icon: 'none', duration: 60000 })
       }
-    }).catch(error => {
-      console.error('获取子分类失败:', error)
-      wx.showToast({
-        title: '获取子分类失败',
-        icon: 'none'
-      })
-    })
+      manager.onStop = (res) => {
+        this.setData({ isRecording: false })
+        wx.hideToast()
+        if (res && res.result) {
+          this.setData({ inputValue: res.result })
+        } else {
+          wx.showToast({ title: '未能识别，请重试', icon: 'none' })
+        }
+      }
+      manager.onError = () => {
+        this.setData({ isRecording: false })
+        wx.hideToast()
+        wx.showToast({ title: '语音识别失败', icon: 'none' })
+      }
+      manager.start({ duration: 60000, lang: 'zh_CN' })
+    } catch (err) {
+      this.setData({ isRecording: false })
+      wx.showToast({ title: '当前环境不支持语音', icon: 'none' })
+    }
   },
 
-  // 跳转到分类列表页
-  jumplist: function(e) {
-    let category_id = e.currentTarget.dataset.category_id;
-    wx.navigateTo({
-      url: '/pages/list/index?category_id=' + category_id
-    })
+  stopVoiceInput: function () {
+    try {
+      const plugin = requirePlugin('WechatSI')
+      plugin.getRecordRecognitionManager().stop()
+    } catch (err) {}
   }
 })

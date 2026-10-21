@@ -119,6 +119,25 @@ const mockData = {
         data: null
       };
     }
+  },
+  
+  // 检查菜谱是否已收藏
+  '/api/recipe.is_favourite/{id}': (req) => {
+    if (req.method === 'GET') {
+      const recipeId = req.url.split('/').pop();
+      const favorites = wx.getStorageSync('favorites') || [];
+      
+      // 检查是否已经收藏
+      const isFavourite = favorites.some(item => item.id == recipeId || item == recipeId);
+      
+      return {
+        code: 0,
+        msg: 'success',
+        data: {
+          is_favourite: isFavourite
+        }
+      };
+    }
   }
 };
 

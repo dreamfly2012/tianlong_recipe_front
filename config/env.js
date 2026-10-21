@@ -4,8 +4,9 @@
 
 // 环境配置存储
 let envConfig = {
-  env: 'trail', // 默认为开发环境
-  baseUrl: 'https://recipe.80shihua.com/api/', // API 基础 URL
+  env: 'release', // 默认为开发环境
+  // 注意：baseUrl 不含具体接口路径，接口 URL 统一以 /api/... 开头，避免拼接出 //api/ 双斜杠
+  baseUrl: 'https://recipe.80shihua.com', // API 基础 URL
   useMock: false, // 是否使用 mock 数据
 };
 

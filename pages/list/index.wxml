@@ -1,15 +1,19 @@
-<!--index.wxml-->
-<view class="container">
-  
-    <view wx:for="{{recipes}}" wx:key="item" class="recipe_wrap">
-    <view bindtap='jumpdetail' data-id="{{item.id}}"> 
-    
-    <image class="pic" mode="aspectFill" src="{{item.image_src}}"></image>
-    <text class="recipe_name">{{item.name}}</text>
-    
+<!--list/index.wxml-->
+<view class="list-page">
+
+  <view class="recipe-grid">
+    <view class="recipe-card" wx:for="{{recipes}}" wx:key="id"
+          bindtap="jumpDetail" data-id="{{item.id}}">
+      <image class="cover" src="{{item.image_src}}" mode="aspectFill"></image>
+      <view class="body">
+        <view class="name ellipsis-2">{{item.name}}</view>
+      </view>
     </view>
-    </view>
-    
-   
-  
+  </view>
+
+  <view class="list-end" wx:if="{{finished && recipes.length}}">— 已经到底啦 —</view>
+  <view class="empty" wx:if="{{!loading && !recipes.length}}">
+    <view class="text">该分类下暂无菜谱</view>
+  </view>
+
 </view>

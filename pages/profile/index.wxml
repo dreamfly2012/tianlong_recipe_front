@@ -1,65 +1,62 @@
+<!--profile/index.wxml-->
 <view class="profile-container">
-  <!-- 用户信息区域 -->
-  <view class="user-info-section">
+
+  <!-- 用户信息头部 -->
+  <view class="header">
     <block wx:if="{{!hasUserInfo}}">
-      <!-- 未登录状态 -->
-      <view class="user-info-placeholder">
-        <image class="avatar-placeholder" src="/image/profile.png"></image>
-        <view class="login-tip">登录以使用更多功能</view>
-        <button 
-          class="login-btn" 
-          bindtap="handleLogin" 
-          loading="{{isLoading}}"
-          hover-class="btn-hover">
-          微信一键登录
-        </button>
+      <view class="header-inner">
+        <image class="avatar" src="/image/profile.png"></image>
+        <view class="header-text">
+          <view class="title">欢迎来到天龙菜谱</view>
+          <view class="subtitle">登录后即可收藏与管理你的美食</view>
+        </view>
       </view>
+      <button class="login-btn" bindtap="handleLogin" loading="{{isLoading}}" hover-class="btn-hover">
+        微信一键登录
+      </button>
     </block>
+
     <block wx:else>
-      <!-- 已登录状态 -->
-      <view class="user-info">
+      <view class="header-inner">
         <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        <view class="user-detail">
-          <view class="nickname">{{userInfo.nickName}}</view>
-          <view class="logout-btn" bindtap="handleLogout">退出登录</view>
+        <view class="header-text">
+          <view class="title">{{userInfo.nickName}}</view>
+          <view class="subtitle">欢迎回来，今天想吃点什么？</view>
         </view>
       </view>
+      <view class="logout-btn" bindtap="handleLogout">退出登录</view>
     </block>
   </view>
 
-  <!-- 功能区域 -->
-  <!-- <view class="feature-section" wx:if="{{hasUserInfo}}">
-    <view class="menu-list">
-      <view class="menu-item" bindtap="goToSettings">
-        <view class="menu-icon">⚙️</view>
-        <view class="menu-text">个人设置</view>
-        <view class="menu-arrow">></view>
+  <!-- 我的收藏 -->
+  <view class="section">
+    <view class="section-title">我的收藏（{{favorites.length}}）</view>
+
+    <view class="recipe-grid" wx:if="{{favorites.length}}">
+      <view class="recipe-card" wx:for="{{favorites}}" wx:key="id"
+            bindtap="goToRecipeDetail" data-id="{{item.id}}">
+        <image class="cover" src="{{item.image_src}}" mode="aspectFill"></image>
+        <view class="body">
+          <view class="name ellipsis-2">{{item.name}}</view>
+        </view>
       </view>
     </view>
-  </view> -->
 
-  <!-- 收藏区域 -->
-  <view class="feature-section">
-    <view class="section-title">我的收藏</view>
-    
-    <!-- 收藏列表 -->
-    <view class="favorites-list">
-      <block wx:if="{{favorites.length > 0}}">
-        <view 
-          class="favorite-item" 
-          wx:for="{{favorites}}" 
-          wx:key="id"
-          bindtap="goToRecipeDetail"
-          data-id="{{item.id}}">
-          <image class="favorite-image" src="{{item.image}}" mode="aspectFill"></image>
-          <view class="favorite-name">{{item.name}}</view>
-        </view>
-      </block>
-      <block wx:else>
-        <view class="empty-favorites">
-          <text>暂无收藏的菜谱</text>
-        </view>
-      </block>
+    <view class="empty" wx:else>
+      <view class="icon">📖</view>
+      <view class="text">{{hasUserInfo ? '还没有收藏，去发现喜欢的美食吧' : '登录后查看你的收藏'}}</view>
     </view>
   </view>
+
+  <!-- 设置入口 -->
+  <view class="section">
+    <view class="menu-card" bindtap="goToSettings">
+      <view class="menu-left">
+        <text class="menu-ico">⚙️</text>
+        <text class="menu-text">个人设置</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
 </view>

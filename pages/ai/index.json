@@ -1,3 +1,6 @@
 {
-  "usingComponents": {}
+  "usingComponents": {},
+  "navigationBarTitleText": "智能助手",
+  "navigationBarBackgroundColor": "#8E54E9",
+  "navigationBarTextStyle": "white"
 }

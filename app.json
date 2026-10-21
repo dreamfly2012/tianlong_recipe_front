@@ -13,10 +13,10 @@
     "pages/settings/index"
   ],
   "tabBar": {
-    "color": "#666",
-    "selectedColor": "#ff0000",
+    "color": "#8A8A8A",
+    "selectedColor": "#FF6B00",
     "borderStyle": "white",
-    "backgroundColor": "#fafafa",
+    "backgroundColor": "#ffffff",
     "list": [{
       "pagePath": "pages/index/index",
       "text": "首页",

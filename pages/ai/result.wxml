@@ -1,25 +1,68 @@
+<!--ai/result.wxml-->
 <view class="result-detail-container">
-  <view wx:if="{{!recipe}}" class="error-msg">未获取到菜谱信息</view>
-  <view wx:elif="{{recipe}}">
-    <view class="card">
-      <image class="recipe-image" src="{{recipe.image}}" mode="aspectFit"/>
-      <view class="recipe-title">{{recipe.title}}</view>
-      <view class="recipe-desc">{{recipe.description}}</view>
-      <view class="recipe-tags">
-        <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag">{{item}}</text>
+
+  <!-- 加载中：可爱 AI 厨师思考动画 -->
+  <view class="loading-mask chef-loading" wx:if="{{loading}}">
+    <view class="chef-stage">
+      <!-- 飘动的食材 -->
+      <text class="float-food ff1">🥕</text>
+      <text class="float-food ff2">🍅</text>
+      <text class="float-food ff3">🥦</text>
+      <text class="float-food ff4">🍳</text>
+      <text class="float-food ff5">🧄</text>
+      <text class="float-food ff6">🥘</text>
+      <text class="float-food ff7">🍄</text>
+
+      <!-- 厨师机器人 -->
+      <view class="chef">
+        <view class="chef-bubble">💡</view>
+        <text class="chef-emoji">👨‍🍳</text>
+        <view class="chef-shadow"></view>
       </view>
-      <view class="section-title">配料</view>
-      <view class="ingredients-list">
-        <text wx:for="{{recipe.ingredients}}" wx:key="*this" class="ingredient">{{item}}</text>
-      </view>
-      <view class="section-title">步骤</view>
-      <view class="steps-list">
-        <view wx:for="{{recipe.steps}}" wx:key="*this" class="step">{{index+1}}. {{item}}</view>
-      </view>
-      <view class="recipe-info">
-        <text>用时：{{recipe.cookingTime}}分钟</text>
-        <text>难度：{{recipe.difficulty}}</text>
-      </view>
+
+      <view class="chef-text">{{loadingText}}<text class="chef-dots"><text class="cd">.</text><text class="cd">.</text><text class="cd">.</text></text></view>
+      <view class="chef-sub">AI 正在为你量身定制专属菜谱，马上就好~</view>
     </view>
   </view>
-</view> 
+
+  <!-- 错误 -->
+  <view class="empty" wx:elif="{{error}}">
+    <view class="icon">😢</view>
+    <view class="text">{{error}}</view>
+  </view>
+
+  <!-- 结果 -->
+  <block wx:elif="{{recipe}}">
+    <view class="card">
+      <image class="recipe-image" src="{{recipe.image_src}}" mode="aspectFit"></image>
+      <view class="recipe-title">{{recipe.name}}</view>
+      <view class="recipe-desc">{{recipe.description}}</view>
+
+      <view class="recipe-tags" wx:if="{{recipe.tags.length}}">
+        <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag">{{item}}</text>
+      </view>
+
+      <view class="info-row" wx:if="{{recipe.cookingTime || recipe.difficulty}}">
+        <view class="info-item" wx:if="{{recipe.cookingTime}}">⏱ {{recipe.cookingTime}} 分钟</view>
+        <view class="info-item" wx:if="{{recipe.difficulty}}">🔥 难度 {{recipe.difficulty}}</view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{recipe.ingredients.length}}">
+      <view class="section-title">食材清单</view>
+      <view class="ingredient-row" wx:for="{{recipe.ingredients}}" wx:key="index">
+        <text class="ingredient-name">{{item.name}}</text>
+        <text class="ingredient-qty">{{item.qty}}</text>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{recipe.directions.length}}">
+      <view class="section-title">做法步骤</view>
+      <view class="step" wx:for="{{recipe.directions}}" wx:key="index">
+        <view class="step-no">{{index + 1}}</view>
+        <view class="step-text">{{item.description}}</view>
+      </view>
+    </view>
+  </block>
+
+</view>

@@ -1,4 +1,7 @@
 {
   "usingComponents": {},
-  "enablePullDownRefresh":true
+  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "天龙菜谱",
+  "navigationBarBackgroundColor": "#FF6B00",
+  "navigationBarTextStyle": "white"
 }

@@ -30,9 +30,7 @@ Page(authUtils.withAuth({
    * 加载用户信息
    */
   loadUserInfo: function() {
-    this.setData({ isLoading: true });
-    
-    // 获取本地存储的用户信息
+    // 先从本地缓存渲染，避免白屏
     const localUserInfo = authUtils.getCurrentUser();
     if (localUserInfo) {
       this.setData({
@@ -45,12 +43,16 @@ Page(authUtils.withAuth({
         }
       });
     }
-    
+
+    // 先关闭 loading（避免请求异常时一直转圈）
+    this.setData({ isLoading: false });
+
     // 从服务器获取最新的用户信息
     accountApi.getUserInfo().then(res => {
-      if (res.code === 0 && res.data) {
+      // 关键：只有 code===0 且有数据才用服务器数据覆盖；
+      // 其余情况保留本地缓存，且无论如何都已将 isLoading 收敛为 false
+      if (res && res.code === 0 && res.data) {
         const serverUserInfo = res.data;
-        
         this.setData({
           userInfo: serverUserInfo,
           formData: {
@@ -58,14 +60,15 @@ Page(authUtils.withAuth({
             gender: serverUserInfo.gender || 0,
             region: serverUserInfo.region || '',
             signature: serverUserInfo.signature || ''
-          },
-          isLoading: false
+          }
         });
+      } else if (res && res.msg) {
+        // 业务层错误（鉴权过期等），提示但不卡 loading
+        wx.showToast({ title: res.msg, icon: 'none' });
       }
     }).catch(err => {
       console.error('获取用户信息失败:', err);
-      this.setData({ isLoading: false });
-      
+      // 网络错误：保留本地缓存渲染，loading 已关闭
       wx.showToast({
         title: '获取用户信息失败',
         icon: 'none'

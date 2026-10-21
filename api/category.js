@@ -1,10 +1,14 @@
-import {request} from '../utils/util.js'
-// baseUrl也可拼接在request.js中，当有多个鉴权模块，放在这里更灵活
+const { request } = require('../utils/util.js')
 
-export function getCategories(data) {
+// 分类列表（parent_id=0 为一级分类）
+function getCategories(data) {
   return request({
-    url: `/api/recipe.category`,
-    method: 'get',
+    url: '/api/recipe.category',
+    method: 'GET',
     data
   })
+}
+
+module.exports = {
+  getCategories
 }

@@ -1,0 +1,235 @@
+/* ===========================================================
+   天龙菜谱 · 全局设计系统 (theme.wxss)
+   设计原则：暖色美食风 + 高对比度（色弱友好）
+   =========================================================== */
+
+/* ---------- 设计令牌（在 app.wxss 的 page 选择器上定义变量） ---------- */
+
+/* ---------- 通用布局 ---------- */
+.page {
+  min-height: 100vh;
+  background-color: var(--bg);
+  padding-bottom: 40rpx;
+}
+
+.safe-bottom {
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-1 { flex: 1; }
+.center { justify-content: center; align-items: center; }
+
+/* ---------- 卡片 ---------- */
+.card {
+  background-color: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* ---------- 区块标题（左侧色条） ---------- */
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin: 8rpx 0 20rpx;
+}
+.section-title::before {
+  content: "";
+  width: 8rpx;
+  height: 32rpx;
+  border-radius: 4rpx;
+  background: linear-gradient(180deg, #FF8A3D 0%, #FF6B00 100%);
+  margin-right: 16rpx;
+}
+.section-title .more {
+  margin-left: auto;
+  font-size: 24rpx;
+  font-weight: 400;
+  color: var(--text-2);
+}
+
+/* ---------- 主按钮 ---------- */
+.btn-primary {
+  background: linear-gradient(135deg, #FF8A3D 0%, #FF6B00 100%);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 48rpx;
+  border: none;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 0, 0.28);
+}
+.btn-primary::after { border: none; }
+.btn-primary.btn-block { width: 100%; }
+.btn-primary.is-loading { opacity: 0.7; }
+
+.btn-ghost {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 48rpx;
+  border: none;
+}
+.btn-ghost::after { border: none; }
+
+/* ---------- 标签 / 徽章 ---------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 22rpx;
+  line-height: 1;
+  padding: 8rpx 18rpx;
+  border-radius: 24rpx;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  margin: 0 12rpx 12rpx 0;
+}
+.tag.gray {
+  background: #F0F0F2;
+  color: var(--text-2);
+}
+
+/* ---------- 空状态 / 错误 ---------- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+  color: var(--text-2);
+}
+.empty .icon { font-size: 80rpx; margin-bottom: 20rpx; }
+.empty .text { font-size: 28rpx; }
+
+.error-tip {
+  color: var(--accent);
+  text-align: center;
+  margin: 40rpx 0;
+  font-size: 30rpx;
+}
+
+/* ---------- 骨架屏 ---------- */
+.skeleton {
+  background: linear-gradient(90deg, #EEEEEE 25%, #F5F5F5 37%, #EEEEEE 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+  border-radius: 12rpx;
+}
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ---------- 菜谱卡片（网格） ---------- */
+.recipe-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.recipe-card {
+  width: calc(50% - 12rpx);
+  background: var(--card);
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-bottom: 24rpx;
+  transition: transform 0.15s ease;
+}
+.recipe-card:active { transform: scale(0.97); }
+.recipe-card .cover {
+  width: 100%;
+  height: 240rpx;
+  background-color: #EEE;
+  display: block;
+}
+.recipe-card .body { padding: 16rpx 18rpx 20rpx; }
+.recipe-card .name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.recipe-card .meta {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: var(--text-2);
+}
+
+/* ---------- 顶部搜索栏（通用） ---------- */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 44rpx;
+  padding: 0 24rpx;
+  height: 76rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+}
+.search-bar .ico {
+  width: 36rpx; height: 36rpx; margin-right: 14rpx;
+  opacity: 0.5;
+}
+.search-bar input {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text);
+}
+.search-bar .voice {
+  width: 52rpx; height: 52rpx;
+  display: flex; align-items: center; justify-content: center;
+}
+.search-bar .voice image { width: 40rpx; height: 40rpx; }
+
+/* ---------- 分割线 ---------- */
+.divider {
+  height: 1rpx;
+  background: var(--border);
+  margin: 8rpx 0;
+}
+
+/* ---------- 漂浮底部按钮 ---------- */
+.fab {
+  position: fixed;
+  right: 32rpx;
+  bottom: calc(48rpx + env(safe-area-inset-bottom));
+  width: 96rpx; height: 96rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF8A3D 0%, #FF6B00 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10rpx 24rpx rgba(255, 107, 0, 0.35);
+  z-index: 50;
+}
+.fab image { width: 48rpx; height: 48rpx; }
+
+/* ---------- 文本工具类 ---------- */
+.t-muted { color: var(--text-2); }
+.t-bold { font-weight: 700; }
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ellipsis-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}

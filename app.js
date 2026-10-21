@@ -1,33 +1,35 @@
 // app.js
-const { initEnv } = require('./config/env.js')
+const { initEnv, getEnvConfig } = require('./config/env.js')
 const wechatApi = require('./api/wechat.js')
+const categoryApi = require('./api/category.js')
 
 App({
   onLaunch: function () {
-    // 初始化环境配置
-    const env =  'develop' // 获取小程序环境
+    // 初始化环境配置（默认 release，可改为 develop / trial）
+    const env = 'release'
     initEnv({
       env,
       config: {
         develop: {
-          // 开发环境配置
           baseUrl: 'http://127.0.0.1:8000',
-          useMock: false // 修改为false，使用真实API而不是mock数据
+          useMock: false
         },
         trial: {
-          // 体验版环境配置
           baseUrl: 'https://recipe.80shihua.com',
           useMock: false
         },
         release: {
-          // 正式环境配置
-          baseUrl: 'https://recipe.80shihua.com/',
+          baseUrl: 'https://recipe.80shihua.com',
           useMock: false
         }
       }
     })
 
-    // 展示本地存储能力
+    // 将 baseUrl 同步到 globalData，供页面/接口复用
+    const envConfig = getEnvConfig()
+    this.globalData.baseUrl = envConfig.baseUrl
+
+    // 展示本地存储能力（用于 logs 页面）
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
@@ -35,23 +37,39 @@ App({
     // 检查登录状态
     this.checkLoginStatus()
 
-    // 打印当前环境信息
-    console.log('[App] 当前环境:', env)
+    // 预加载分类数据（写入本地缓存），让用户点「分类」tab 时秒出
+    this.preloadCategories()
+
+    console.log('[App] 当前环境:', env, 'baseUrl:', envConfig.baseUrl)
+  },
+
+  /**
+   * 预加载分类并写入本地缓存：一级分类 + 首个分类的子分类
+   * 失败静默忽略，不影响启动
+   */
+  preloadCategories: function () {
+    const TOP_KEY = 'cat_top_cache'
+    categoryApi.getCategories({ parent_id: 0 }).then(res => {
+      const cats = (res && res.data) || []
+      try { wx.setStorageSync(TOP_KEY, cats) } catch (e) {}
+      const first = cats[0]
+      if (first) {
+        categoryApi.getCategories({ parent_id: first.id }).then(r2 => {
+          try { wx.setStorageSync('cat_children_' + first.id, (r2 && r2.data) || []) } catch (e) {}
+        }).catch(() => {})
+      }
+    }).catch(() => {})
   },
 
   /**
    * 检查登录状态
    */
-  checkLoginStatus: function() {
-    // 检查是否有登录态
+  checkLoginStatus: function () {
     const isLoggedIn = wechatApi.checkLoginStatus()
     if (isLoggedIn) {
-      // 获取用户信息
       const userInfo = wechatApi.getUserInfo()
       this.globalData.userInfo = userInfo
       this.globalData.isLoggedIn = true
-      
-      // 如果有回调函数，执行回调
       if (this.userInfoReadyCallback) {
         this.userInfoReadyCallback(userInfo)
       }
@@ -61,59 +79,53 @@ App({
   },
 
   /**
-   * 全局登录方法
+   * 全局登录方法（兼容 getUserProfile 已失效场景，失败回退到 code-only 登录）
    */
-  login: function() {
+  login: function () {
     return new Promise((resolve, reject) => {
-      // 获取微信登录凭证
       wx.login({
         success: (loginRes) => {
-          if (loginRes.code) {
-            // 获取用户信息
-            wx.getUserProfile({
-              desc: '用于完善会员资料',
-              success: (profileRes) => {
-                // 调用后端登录接口
-                wechatApi.login({
-                  code: loginRes.code,
-                  userInfo: profileRes.userInfo
-                }).then(res => {
-                  if (res.code === 0) {
-                    // 保存登录信息
-                    wechatApi.saveLoginInfo({
-                      token: res.data.token,
-                      userInfo: profileRes.userInfo
-                    })
-                    
-                    // 更新全局状态
-                    this.globalData.userInfo = profileRes.userInfo
-                    this.globalData.isLoggedIn = true
-                    
-                    resolve(profileRes.userInfo)
-                  } else {
-                    reject(new Error(res.msg || '登录失败'))
-                  }
-                }).catch(err => {
-                  reject(err)
-                })
-              },
-              fail: (err) => {
-                reject(new Error('获取用户信息失败'))
-              }
-            })
-          } else {
+          if (!loginRes.code) {
             reject(new Error('获取登录凭证失败'))
+            return
           }
+          const doLogin = (userInfo) => {
+            wechatApi.login({ code: loginRes.code, userInfo })
+              .then(res => {
+                if (res.code === 0 || res.authenticated === true) {
+                  const token = (res.data && res.data.token) || res.token
+                  const info = (res.data && res.data.user) || userInfo
+                  if (!token) {
+                    reject(new Error('登录失败：未获取到有效凭证'))
+                    return
+                  }
+                  wechatApi.saveLoginInfo({ token, userInfo: info })
+                  this.globalData.userInfo = info
+                  this.globalData.isLoggedIn = true
+                  resolve(info)
+                } else {
+                  reject(new Error(res.msg || '登录失败'))
+                }
+              })
+              .catch(reject)
+          }
+
+          // 优先尝试获取用户信息（按钮点击触发时有效）
+          wx.getUserProfile({
+            desc: '用于完善会员资料',
+            success: (profileRes) => doLogin(profileRes.userInfo),
+            // 失败时回退为默认用户信息（code-only 登录）
+            fail: () => doLogin({ nickName: '天龙用户', avatarUrl: '/image/profile.png', gender: 0 })
+          })
         },
-        fail: (err) => {
-          reject(new Error('微信登录失败'))
-        }
+        fail: () => reject(new Error('微信登录失败'))
       })
     })
   },
 
   globalData: {
     userInfo: null,
-    isLoggedIn: false
+    isLoggedIn: false,
+    baseUrl: 'https://recipe.80shihua.com'
   }
 })
