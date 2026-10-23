@@ -48,15 +48,4 @@
     </view>
   </view>
 
-  <!-- 设置入口 -->
-  <view class="section">
-    <view class="menu-card" bindtap="goToSettings">
-      <view class="menu-left">
-        <text class="menu-ico">⚙️</text>
-        <text class="menu-text">个人设置</text>
-      </view>
-      <text class="menu-arrow">›</text>
-    </view>
-  </view>
-
 </view>

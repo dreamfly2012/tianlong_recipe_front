@@ -1,13 +1,21 @@
 <!--ai/index.wxml-->
 <view class="ai-page">
 
+  <!-- 未登录引导 -->
+  <view class="login-banner" wx:if="{{needLogin}}">
+    <view class="login-banner-title">👋 欢迎使用 AI 美食助手</view>
+    <view class="login-banner-sub">登录后即可查看专属推荐、生成智能菜单</view>
+    <button class="login-banner-btn" bindtap="goLogin">微信登录</button>
+  </view>
+
   <!-- 头部 -->
   <view class="hero">
     <view class="hero-title">AI 智能美食助手</view>
     <view class="hero-sub">懂你的口味，更懂你的厨房</view>
   </view>
 
-  <!-- 今日推荐：横向滚动 -->
+  <!-- 今日推荐 + 为你推荐：仅登录后展示 -->
+  <block wx:if="{{!needLogin}}">
   <view class="section">
     <view class="section-title">今日推荐</view>
     <scroll-view scroll-x="true" class="recipe-scroll" wx:if="{{dailyRecipes.length}}">
@@ -44,6 +52,8 @@
       <view class="text">暂无推荐，去生成专属菜单吧</view>
     </view>
   </view>
+
+  </block>
 
   <!-- 智能菜单 -->
   <view class="section">

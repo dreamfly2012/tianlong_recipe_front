@@ -61,7 +61,7 @@ const checkAuth = (options = {}) => {
       // 保存当前页面路径
       wx.setStorageSync('auth_redirect_url', fullPath);
       
-      // 跳转到个人中心页面
+      // 跳转到个人中心页面（登录入口）
       setTimeout(() => {
         wx.switchTab({
           url: '/pages/profile/index'

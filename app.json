@@ -9,8 +9,7 @@
     "pages/search/index",
     "pages/ai/index",
     "pages/ai/menu",
-    "pages/ai/result",
-    "pages/settings/index"
+    "pages/ai/result"
   ],
   "tabBar": {
     "color": "#8A8A8A",
@@ -51,7 +50,7 @@
   "lazyCodeLoading": "requiredComponents",
   "plugins": {
     "WechatSI": {
-      "version": "0.3.6",
+      "version": "0.3.7",
       "provider": "wx069ba97219f66d99"
     }
   }

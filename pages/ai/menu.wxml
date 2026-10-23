@@ -1,6 +1,13 @@
 <!--ai/menu.wxml-->
 <view class="menu-page">
 
+  <!-- 未登录引导 -->
+  <view class="login-banner" wx:if="{{needLogin}}">
+    <view class="login-banner-title">🔒 智能菜单生成需登录</view>
+    <view class="login-banner-sub">登录后，AI 才能记住你的口味并保存专属菜单</view>
+    <button class="login-banner-btn" bindtap="goLogin">微信登录</button>
+  </view>
+
   <view class="tips-card">
     <view class="tips-title">✨ 告诉我你的需求</view>
     <view class="tips-text">AI 将根据食材与偏好，为你生成专属菜谱</view>

@@ -8,16 +8,27 @@ Page({
     dailyRecipes: [],
     personalizedRecipes: [],
     loadingDaily: true,
-    loadingPersonal: true
+    loadingPersonal: true,
+    needLogin: false
   },
 
   onLoad: function () {
-    this.loadDailyRecommend()
-    this.loadPersonalizedRecommend()
+    this.syncLoginAndLoad()
   },
 
   onShow: function () {
     // 每次进入刷新（登录态可能变化）
+    this.syncLoginAndLoad()
+  },
+
+  // 同步登录态：未登录展示登录引导，已登录加载推荐
+  syncLoginAndLoad: function () {
+    const needLogin = !this.isLoggedIn()
+    this.setData({ needLogin })
+    if (needLogin) {
+      this.setData({ dailyRecipes: [], personalizedRecipes: [], loadingDaily: false, loadingPersonal: false })
+      return
+    }
     this.loadDailyRecommend()
     this.loadPersonalizedRecommend()
   },
@@ -55,7 +66,17 @@ Page({
   },
 
   goMenu: function () {
+    if (!this.isLoggedIn()) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      setTimeout(() => wx.switchTab({ url: '/pages/profile/index' }), 1200)
+      return
+    }
     wx.navigateTo({ url: '/pages/ai/menu' })
+  },
+
+  // 跳转「我的」页去登录
+  goLogin: function () {
+    wx.switchTab({ url: '/pages/profile/index' })
   },
 
   jumpDetail: function (e) {
