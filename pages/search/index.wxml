@@ -6,17 +6,64 @@
     <view class="search-bar">
       <image class="ico" src="/image/search.png"></image>
       <input class="input" placeholder="搜索菜谱名称"
-             value="{{keyword}}" bindinput="onSearchChange"
-             bindconfirm="onSearchConfirm" confirm-type="search" focus="{{!keyword}}" />
+             value="{{keyword}}" maxlength="30" confirm-type="search"
+             focus="{{inputFocus}}"
+             bindinput="onSearchChange"
+             bindconfirm="onSearchConfirm"
+             bindfocus="onInputFocus"
+             bindblur="onInputBlur"
+             bindtap="onInputTap" />
+      <view class="clear" wx:if="{{keyword}}" bindtap="onClearInput">×</view>
       <view class="search-btn" bindtap="onSearch">搜索</view>
     </view>
   </view>
 
-  <!-- 结果区 -->
-  <view class="result" wx:if="{{searched}}">
+  <!-- 搜索历史 / 热门搜索 -->
+  <view class="panel" wx:if="{{showPanel}}">
+    <block wx:if="{{history.length}}">
+      <view class="panel-head">
+        <text class="panel-title">搜索历史</text>
+        <text class="panel-action" bindtap="onClearHistory">清空</text>
+      </view>
+      <view class="chips">
+        <view class="chip" wx:for="{{history}}" wx:key="*this"
+              data-kw="{{item}}" bindtap="onTapKeyword">{{item}}</view>
+      </view>
+    </block>
+
+    <view class="panel-head {{history.length ? 'gap' : ''}}">
+      <text class="panel-title">热门搜索</text>
+    </view>
+    <view class="chips">
+      <view class="chip hot" wx:for="{{hotWords}}" wx:key="*this"
+            data-kw="{{item}}" bindtap="onTapKeyword">
+        <text class="rank" wx:if="{{index < 3}}">{{index + 1}}</text>
+        <text>{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 输入联想 -->
+  <view class="suggest" wx:if="{{showSuggest}}">
+    <view class="suggest-item" wx:for="{{suggestions}}" wx:key="text"
+          data-kw="{{item.text}}" bindtap="onTapKeyword">
+      <image class="ico" src="/image/search.png"></image>
+      <view class="suggest-text">
+        <text>{{item.before}}</text><text class="hit">{{item.hit}}</text><text>{{item.after}}</text>
+      </view>
+    </view>
+    <view class="suggest-empty" wx:if="{{!suggestions.length}}">
+      {{suggesting ? '正在联想…' : '暂无联想，直接搜索试试'}}
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="result" wx:if="{{searched && !showPanel && !showSuggest}}">
     <view class="result-head" wx:if="{{recipes.length}}">
       找到 <text class="hl">{{recipes.length}}</text> 个相关菜谱
     </view>
+
+    <view class="loading-tip" wx:if="{{loading && !recipes.length}}">正在搜索…</view>
 
     <view class="recipe-grid">
       <view class="recipe-card" wx:for="{{recipes}}" wx:key="id"
@@ -38,14 +85,20 @@
     </view>
 
     <view class="list-end" wx:if="{{finished && recipes.length}}">— 已经到底啦 —</view>
-    <view class="empty" wx:if="{{!loading && searched && !recipes.length}}">
+
+    <view class="empty" wx:if="{{!loading && !recipes.length}}">
       <view class="icon">🔍</view>
       <view class="text">没有找到「{{keyword}}」相关的菜谱</view>
+      <view class="empty-hint">换个关键词试试</view>
+      <view class="chips">
+        <view class="chip" wx:for="{{hotWords}}" wx:key="*this"
+              data-kw="{{item}}" bindtap="onTapKeyword">{{item}}</view>
+      </view>
     </view>
   </view>
 
-  <!-- 未搜索时的引导 -->
-  <view class="empty" wx:else>
+  <!-- 默认引导 -->
+  <view class="empty" wx:if="{{!searched && !showPanel && !showSuggest}}">
     <view class="icon">🍜</view>
     <view class="text">输入菜名，发现你的下一顿美食</view>
   </view>
