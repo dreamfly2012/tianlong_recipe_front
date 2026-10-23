@@ -79,7 +79,7 @@ App({
   },
 
   /**
-   * 全局登录方法（兼容 getUserProfile 已失效场景，失败回退到 code-only 登录）
+   * 全局登录方法（code-only 静默登录，用户头像昵称通过「头像昵称填写」组件由 profile 页单独处理）
    */
   login: function () {
     return new Promise((resolve, reject) => {
@@ -89,34 +89,29 @@ App({
             reject(new Error('获取登录凭证失败'))
             return
           }
-          const doLogin = (userInfo) => {
-            wechatApi.login({ code: loginRes.code, userInfo })
-              .then(res => {
-                if (res.code === 0 || res.authenticated === true) {
-                  const token = (res.data && res.data.token) || res.token
-                  const info = (res.data && res.data.user) || userInfo
-                  if (!token) {
-                    reject(new Error('登录失败：未获取到有效凭证'))
-                    return
-                  }
-                  wechatApi.saveLoginInfo({ token, userInfo: info })
-                  this.globalData.userInfo = info
-                  this.globalData.isLoggedIn = true
-                  resolve(info)
-                } else {
-                  reject(new Error(res.msg || '登录失败'))
-                }
-              })
-              .catch(reject)
+          const defaultUserInfo = {
+            nickName: '天龙用户',
+            avatarUrl: '/image/profile.png',
+            gender: 0
           }
-
-          // 优先尝试获取用户信息（按钮点击触发时有效）
-          wx.getUserProfile({
-            desc: '用于完善会员资料',
-            success: (profileRes) => doLogin(profileRes.userInfo),
-            // 失败时回退为默认用户信息（code-only 登录）
-            fail: () => doLogin({ nickName: '天龙用户', avatarUrl: '/image/profile.png', gender: 0 })
-          })
+          wechatApi.login({ code: loginRes.code, userInfo: defaultUserInfo })
+            .then(res => {
+              if (res.code === 0 || res.authenticated === true) {
+                const token = (res.data && res.data.token) || res.token
+                const info = (res.data && res.data.user) || defaultUserInfo
+                if (!token) {
+                  reject(new Error('登录失败：未获取到有效凭证'))
+                  return
+                }
+                wechatApi.saveLoginInfo({ token, userInfo: info })
+                this.globalData.userInfo = info
+                this.globalData.isLoggedIn = true
+                resolve(info)
+              } else {
+                reject(new Error(res.msg || '登录失败'))
+              }
+            })
+            .catch(reject)
         },
         fail: () => reject(new Error('微信登录失败'))
       })

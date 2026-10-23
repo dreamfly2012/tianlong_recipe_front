@@ -7,6 +7,15 @@
       <image class="cover" src="{{item.image_src}}" mode="aspectFill"></image>
       <view class="body">
         <view class="name ellipsis-2">{{item.name}}</view>
+        <view class="meta" wx:if="{{item.cookingTimeText || item.difficultyText}}">
+          <view class="meta-item" wx:if="{{item.cookingTimeText}}">⏱ {{item.cookingTimeText}}</view>
+          <view class="meta-sep" wx:if="{{item.cookingTimeText && item.difficultyText}}"></view>
+          <view class="meta-item" wx:if="{{item.difficultyText}}">🔥 {{item.difficultyText}}</view>
+        </view>
+        <view class="tags" wx:if="{{item.tagList && item.tagList.length}}">
+          <view class="tag" wx:for="{{item.tagList}}" wx:for-item="tag" wx:key="*this">{{tag}}</view>
+          <text class="tag-more" wx:if="{{item.tagMore > 0}}">+{{item.tagMore}}</text>
+        </view>
       </view>
     </view>
   </view>

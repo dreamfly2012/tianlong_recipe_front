@@ -5,12 +5,14 @@
   <view class="header">
     <block wx:if="{{!hasUserInfo}}">
       <view class="header-inner">
+        <!-- 未登录仅展示默认头像，不采集头像昵称（微信新规不支持弹窗授权，静默登录即可） -->
         <image class="avatar" src="/image/profile.png"></image>
         <view class="header-text">
           <view class="title">欢迎来到天龙菜谱</view>
           <view class="subtitle">登录后即可收藏与管理你的美食</view>
         </view>
       </view>
+
       <button class="login-btn" bindtap="handleLogin" loading="{{isLoading}}" hover-class="btn-hover">
         微信一键登录
       </button>
@@ -18,13 +20,35 @@
 
     <block wx:else>
       <view class="header-inner">
-        <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+        <!-- 头像选择按钮（登录后点击可更换头像）-->
+        <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+        </button>
         <view class="header-text">
-          <view class="title">{{userInfo.nickName}}</view>
+          <!-- 昵称展示态：点击“编辑”进入修改 -->
+          <view wx:if="{{!editingNickname}}" class="nickname-row">
+            <view class="title nickname-text">{{userInfo.nickName}}</view>
+            <view class="edit-link" bindtap="startEditNickname">编辑</view>
+          </view>
+          <!-- 昵称编辑态：type="nickname" 可调起微信昵称快速填写 -->
+          <input wx:else
+                 class="nickname-input"
+                 type="nickname"
+                 value="{{nicknameDraft}}"
+                 focus="{{editingNickname}}"
+                 placeholder="请输入昵称"
+                 bindinput="onNicknameDraftInput"
+                 bindconfirm="saveNickname" />
           <view class="subtitle">欢迎回来，今天想吃点什么？</view>
         </view>
       </view>
-      <view class="logout-btn" bindtap="handleLogout">退出登录</view>
+
+      <!-- 编辑昵称时显示 保存/取消，否则显示 退出登录 -->
+      <view wx:if="{{editingNickname}}" class="nickname-actions">
+        <view class="action-btn action-btn--primary" bindtap="saveNickname">保存</view>
+        <view class="action-btn" bindtap="cancelEditNickname">取消</view>
+      </view>
+      <view wx:else class="logout-btn" bindtap="handleLogout">退出登录</view>
     </block>
   </view>
 
@@ -38,6 +62,15 @@
         <image class="cover" src="{{item.image_src}}" mode="aspectFill"></image>
         <view class="body">
           <view class="name ellipsis-2">{{item.name}}</view>
+          <view class="meta" wx:if="{{item.cookingTimeText || item.difficultyText}}">
+            <view class="meta-item" wx:if="{{item.cookingTimeText}}">⏱ {{item.cookingTimeText}}</view>
+            <view class="meta-sep" wx:if="{{item.cookingTimeText && item.difficultyText}}"></view>
+            <view class="meta-item" wx:if="{{item.difficultyText}}">🔥 {{item.difficultyText}}</view>
+          </view>
+          <view class="tags" wx:if="{{item.tagList && item.tagList.length}}">
+            <view class="tag" wx:for="{{item.tagList}}" wx:for-item="tag" wx:key="*this">{{tag}}</view>
+            <text class="tag-more" wx:if="{{item.tagMore > 0}}">+{{item.tagMore}}</text>
+          </view>
         </view>
       </view>
     </view>
