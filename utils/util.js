@@ -25,12 +25,18 @@ const formatNumber = n => {
  * @param {string} options.method - 请求方法，'GET' | 'POST' | 'PUT' | 'DELETE'
  * @param {Object} options.data - 请求数据
  * @param {boolean} options.requiresAuth - 是否需要认证，默认为 false
+ * @param {boolean} options.silent - 失败时是否静默（不弹 toast），默认为 false
  * @returns {Promise} - 成功时 resolve(res.data)，失败时 reject(error)
  */
 const request = (options) => {
   return new Promise((resolve, reject) => {
-    const { url, data, method, requiresAuth = false } = options;
+    const { url, data, method, requiresAuth = false, silent = false } = options;
     const envConfig = getEnvConfig();
+
+    // 静默请求用于联想、热门词等后台补全场景，失败时不打扰用户
+    const notify = (opts) => {
+      if (!silent) wx.showToast(opts);
+    };
 
     // 规范化 method 为大写，避免 wx.request 不识别小写
     const upperMethod = (method || 'GET').toUpperCase();
@@ -76,13 +82,13 @@ const request = (options) => {
               app.globalData.isLoggedIn = false;
               app.globalData.userInfo = null;
             }
-            wx.showToast({ title: '登录已过期，请重新登录', icon: 'none', duration: 2000 });
-            setTimeout(() => wx.switchTab({ url: '/pages/profile/index' }), 1800);
+            notify({ title: '登录已过期，请重新登录', icon: 'none', duration: 2000 });
+            if (!silent) setTimeout(() => wx.switchTab({ url: '/pages/profile/index' }), 1800);
             reject(new Error('登录已过期'));
             return;
           }
           if (res.statusCode === 403) {
-            wx.showToast({ title: '您没有权限执行此操作', icon: 'none', duration: 2000 });
+            notify({ title: '您没有权限执行此操作', icon: 'none', duration: 2000 });
             reject(new Error('权限不足'));
             return;
           }
@@ -91,7 +97,7 @@ const request = (options) => {
             return;
           }
           if (res.statusCode >= 500) {
-            wx.showToast({ title: '服务器错误，请稍后重试', icon: 'none', duration: 2000 });
+            notify({ title: '服务器错误，请稍后重试', icon: 'none', duration: 2000 });
             reject(new Error('服务器错误'));
             return;
           }
@@ -116,7 +122,7 @@ const request = (options) => {
           if (err.errMsg.indexOf('timeout') > -1) errorMsg = '请求超时，请检查网络';
           else if (err.errMsg.indexOf('fail') > -1) errorMsg = '网络连接失败，请检查网络设置';
         }
-        wx.showToast({ title: errorMsg, icon: 'none', duration: 2000 });
+        notify({ title: errorMsg, icon: 'none', duration: 2000 });
         reject(new Error(errorMsg));
       }
     });
