@@ -3,6 +3,10 @@ const wechatApi = require('../../api/wechat');
 const authUtils = require('../../utils/auth');
 const accountApi = require("../../api/account")
 const { normalizeRecipes } = require("../../utils/image")
+const { getEnvConfig } = require('../../config/env')
+
+// 默认头像
+const DEFAULT_AVATAR = '/image/profile.png';
 
 Page({
   /**
@@ -12,14 +16,16 @@ Page({
     userInfo: {},
     hasUserInfo: false,
     isLoading: false,
-    favorites: []
+    favorites: [],
+    // 已登录后编辑昵称相关状态
+    editingNickname: false,
+    nicknameDraft: ''
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    // 检查是否已登录
     this.checkLoginStatus();
   },
 
@@ -27,16 +33,14 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    // 每次显示页面时检查登录状态
     this.checkLoginStatus();
-    // 加载收藏的菜谱
     this.loadFavorites();
   },
 
   /**
    * 检查登录状态
    */
-  checkLoginStatus: function() {
+  checkLoginStatus: function () {
     const isLoggedIn = wechatApi.checkLoginStatus();
     if (isLoggedIn) {
       const userInfo = wechatApi.getUserInfo();
@@ -45,9 +49,12 @@ Page({
         hasUserInfo: true
       });
     } else {
+      // 未登录，重置编辑状态
       this.setData({
         userInfo: {},
-        hasUserInfo: false
+        hasUserInfo: false,
+        editingNickname: false,
+        nicknameDraft: ''
       });
     }
   },
@@ -55,14 +62,12 @@ Page({
   /**
    * 加载收藏的菜谱
    */
-  loadFavorites: function() {
-    // 未登录时不调用需鉴权接口，避免触发强制登录循环跳转
+  loadFavorites: function () {
     if (!wx.getStorageSync('token')) {
       this.setData({ favorites: [] });
       return;
     }
     accountApi.getFavorites(1).then(result => {
-      // 兼容多种返回结构：{ data: { data: [] } } / { data: [] } / []
       let favorites = [];
       if (result && result.data) {
         if (Array.isArray(result.data)) {
@@ -81,231 +86,246 @@ Page({
   },
 
   /**
-   * 微信登录
+   * 微信新规：头像选择回调（仅登录后“点击头像更换”会触发）
    */
-  handleLogin: function() {
-    if (this.data.isLoading) return;
-    
-    this.setData({ isLoading: true });
-    
-    console.log('开始登录流程...');
-    
-    // 1. 直接获取用户信息（必须在用户点击事件中直接调用）
-    wx.getUserProfile({
-      desc: '获取您的昵称个性化用来推荐菜谱',
-      lang: 'zh_CN',
-      success: (profileRes) => {
-        console.log('wx.getUserProfile 成功:', profileRes);
-        
-        // 2. 获取用户信息成功后，再获取微信登录凭证
-        wx.login({
-          success: (loginRes) => {
-            console.log('wx.login 成功:', loginRes);
-            
-            if (loginRes.code) {
-              // 3. 调用后端登录接口
-              wechatApi.login({
-                code: loginRes.code,
-                userInfo: profileRes.userInfo
-              }).then(res => {
-                console.log('后端登录接口返回:', res);
-                
-                // 检查返回的数据结构：request 约定 resolve 出完整 res.data，
-                // 后端 wechatLogin 返回 { code:0, data:{ token, user, ... }, msg }
-                if (res.code === 0 || res.authenticated === true) {
-                  // 4. 保存登录信息（token 与 user 都在 res.data 下）
-                  const token = res.data?.token || res.token;
-                  // 后端 user 对象头像字段为 wechat_avatar，前端统一为 avatarUrl
-                  const rawUser = res.data?.user || res.user || profileRes.userInfo;
-                  const userInfo = {
-                    ...rawUser,
-                    nickName: rawUser.wechat_nickname || rawUser.nickName || rawUser.name || profileRes.userInfo?.nickName || '',
-                    avatarUrl: rawUser.wechat_avatar || rawUser.avatarUrl || profileRes.userInfo?.avatarUrl || '/image/profile.png',
-                    gender: rawUser.gender || 0
-                  };
+  onChooseAvatar: function (e) {
+    const { avatarUrl } = e.detail;
+    console.log('[onChooseAvatar] 选中头像临时路径:', avatarUrl);
+    if (!this.data.hasUserInfo) return;
+    // 上传头像到服务端并更新后端用户资料
+    this.uploadAndUpdateAvatar(avatarUrl);
+  },
 
-                  if (!token) {
-                    this.handleLoginError('登录失败: 未获取到有效的登录凭证');
-                    return;
-                  }
+  /**
+   * 已登录时上传头像并更新用户资料
+   */
+  uploadAndUpdateAvatar: function (tempFilePath) {
+    wx.showLoading({ title: '头像上传中...' });
+    this.uploadAvatarToServer(tempFilePath).then(url => {
+      // 更新后端用户资料（同时传 avatarUrl 和 wechat_avatar，兼容后端不同字段命名）
+      return accountApi.updateUserInfo({
+        avatarUrl: url,
+        wechat_avatar: url
+      }).then(() => {
+        // 更新本地存储
+        const userInfo = { ...this.data.userInfo, avatarUrl: url, wechat_avatar: url };
+        wechatApi.saveLoginInfo({ token: wx.getStorageSync('token'), userInfo });
+        this.setData({ userInfo });
+        wx.showToast({ title: '头像更新成功', icon: 'success' });
+      });
+    }).catch(err => {
+      console.error('头像上传/更新失败:', err);
+      wx.showToast({ title: err.message || '头像更新失败', icon: 'none' });
+    }).finally(() => {
+      wx.hideLoading();
+    });
+  },
 
-                  wechatApi.saveLoginInfo({
-                    token: token,
-                    userInfo: userInfo
-                  });
-                  
-                  // 5. 更新页面状态
-                  this.setData({
-                    userInfo: userInfo,
-                    hasUserInfo: true,
-                    isLoading: false
-                  });
-                  
-                  wx.showToast({
-                    title: '登录成功',
-                    icon: 'success'
-                  });
-                  
-                  // 6. 处理登录成功后的跳转
-                  setTimeout(() => {
-                    authUtils.handleAuthRedirect();
-                  }, 1500);
-                } else {
-                  this.handleLoginError('登录失败: ' + (res.msg || '未知错误'));
-                }
-              }).catch(err => {
-                console.error('后端登录请求失败:', err);
-                this.handleLoginError('登录请求失败: ' + (err.message || '网络错误'));
-              });
-            } else {
-              this.handleLoginError('获取登录凭证失败');
+  /**
+   * 通用：上传临时头像文件到服务器，返回永久 URL
+   * @param {string} tempFilePath - chooseAvatar 返回的 wxfile:// 临时路径
+   * @returns {Promise<string>} 永久 https:// URL
+   */
+  uploadAvatarToServer: function (tempFilePath) {
+    return new Promise((resolve, reject) => {
+      const baseUrl = getEnvConfig().baseUrl;
+      const uploadUrl = `${baseUrl}/api/upload/avatar`;
+      const token = wx.getStorageSync('token');
+
+      wx.uploadFile({
+        url: uploadUrl,
+        filePath: tempFilePath,
+        name: 'file',
+        header: token ? { 'Authorization': `Bearer ${token}` } : {},
+        success: (res) => {
+          console.log('[uploadAvatar] 原始返回:', res);
+          try {
+            const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+            // 兼容多种后端返回格式：{ url } / { data: { url } } / { data: 'xxx' }
+            const url = data?.url
+              || data?.data?.url
+              || data?.data
+              || data?.file_url
+              || data?.fileUrl;
+            if (!url) {
+              reject(new Error('上传成功但未获取到图片地址'));
+              return;
             }
-          },
-          fail: (err) => {
-            console.error('wx.login 失败:', err);
-            this.handleLoginError('微信登录失败，请检查网络连接');
+            resolve(url);
+          } catch (e) {
+            console.error('上传响应解析失败:', e);
+            reject(new Error('上传响应解析失败'));
           }
+        },
+        fail: (err) => {
+          console.error('[uploadAvatar] wx.uploadFile 失败:', err);
+          // 注意：如果后端还没实现 /api/upload/avatar 接口，这里会失败
+          reject(new Error('头像上传失败，请检查网络或联系管理员配置上传接口'));
+        }
+      });
+    });
+  },
+
+  /**
+   * 进入昵称编辑态
+   */
+  startEditNickname: function () {
+    this.setData({
+      editingNickname: true,
+      nicknameDraft: this.data.userInfo.nickName || ''
+    });
+  },
+
+  /**
+   * 昵称编辑输入回调（type="nickname" 可快捷使用微信昵称）
+   */
+  onNicknameDraftInput: function (e) {
+    this.setData({ nicknameDraft: e.detail.value });
+  },
+
+  /**
+   * 取消昵称编辑
+   */
+  cancelEditNickname: function () {
+    this.setData({
+      editingNickname: false,
+      nicknameDraft: ''
+    });
+  },
+
+  /**
+   * 保存昵称到服务端
+   */
+  saveNickname: function () {
+    const nickName = (this.data.nicknameDraft || '').trim();
+    if (!nickName) {
+      wx.showToast({ title: '昵称不能为空', icon: 'none' });
+      return;
+    }
+    // 昵称未变化：直接退出编辑态
+    if (nickName === (this.data.userInfo.nickName || '')) {
+      this.setData({ editingNickname: false, nicknameDraft: '' });
+      return;
+    }
+
+    wx.showLoading({ title: '保存中...' });
+    // 同时传 nickName 和 wechat_nickname，兼容后端不同字段命名
+    accountApi.updateUserInfo({
+      nickName: nickName,
+      wechat_nickname: nickName
+    }).then(() => {
+      const userInfo = {
+        ...this.data.userInfo,
+        nickName: nickName,
+        wechat_nickname: nickName
+      };
+      wechatApi.saveLoginInfo({
+        token: wx.getStorageSync('token'),
+        userInfo: userInfo
+      });
+      this.setData({
+        userInfo: userInfo,
+        editingNickname: false,
+        nicknameDraft: ''
+      });
+      wx.showToast({ title: '昵称已更新', icon: 'success' });
+    }).catch(err => {
+      console.error('昵称更新失败:', err);
+      wx.showToast({ title: (err && err.message) || '昵称更新失败', icon: 'none' });
+    }).finally(() => {
+      wx.hideLoading();
+    });
+  },
+
+  /**
+   * 微信一键静默登录
+   * 微信 2022 新规后 wx.getUserProfile 已无法弹窗获取头像昵称，
+   * 因此登录时不再采集头像昵称，由后端赋默认值；用户可在登录后自行修改。
+   */
+  handleLogin: function () {
+    if (this.data.isLoading) return;
+
+    this.setData({ isLoading: true });
+    console.log('开始微信静默登录...');
+
+    // 1. 获取微信登录凭证
+    wx.login({
+      success: (loginRes) => {
+        console.log('wx.login 成功:', loginRes);
+        if (!loginRes.code) {
+          this.handleLoginError('获取登录凭证失败');
+          return;
+        }
+
+        // 2. 调用后端登录接口（传默认昵称头像占位，保持后端契约一致；用户登录后可修改）
+        const defaultUserInfo = {
+          nickName: '天龙用户',
+          avatarUrl: DEFAULT_AVATAR,
+          gender: 0
+        };
+        wechatApi.login({
+          code: loginRes.code,
+          userInfo: defaultUserInfo
+        }).then(res => {
+          console.log('后端登录接口返回:', res);
+
+          if (res.code === 0 || res.authenticated === true) {
+            const token = res.data?.token || res.token;
+            const rawUser = res.data?.user || res.user || defaultUserInfo;
+            const finalUserInfo = {
+              ...rawUser,
+              nickName: rawUser.wechat_nickname || rawUser.nickName || rawUser.name || defaultUserInfo.nickName,
+              avatarUrl: rawUser.wechat_avatar || rawUser.avatarUrl || defaultUserInfo.avatarUrl,
+              gender: rawUser.gender || 0
+            };
+
+            if (!token) {
+              this.handleLoginError('登录失败: 未获取到有效的登录凭证');
+              return;
+            }
+
+            wechatApi.saveLoginInfo({ token, userInfo: finalUserInfo });
+
+            this.setData({
+              userInfo: finalUserInfo,
+              hasUserInfo: true,
+              isLoading: false,
+              editingNickname: false,
+              nicknameDraft: ''
+            });
+
+            wx.showToast({ title: '登录成功', icon: 'success' });
+            setTimeout(() => {
+              authUtils.handleAuthRedirect();
+            }, 1500);
+          } else {
+            this.handleLoginError('登录失败: ' + (res.msg || '未知错误'));
+          }
+        }).catch(err => {
+          console.error('后端登录请求失败:', err);
+          this.handleLoginError('登录请求失败: ' + (err.message || '网络错误'));
         });
       },
       fail: (err) => {
-        console.error('wx.getUserProfile 失败:', err);
-        this.setData({ isLoading: false });
-        
-        // 用户拒绝授权的情况
-        if (err.errMsg && err.errMsg.indexOf('auth deny') > -1) {
-          this.handleLoginError('您已拒绝授权获取用户信息');
-          wx.showModal({
-            title: '提示',
-            content: '需要您授权获取用户信息才能完成登录，是否重新授权？',
-            success: (res) => {
-              if (res.confirm) {
-                // 用户点击确定，重新尝试登录
-                setTimeout(() => {
-                  this.handleLogin();
-                }, 500);
-              }
-            }
-          });
-        } else {
-          // 其他错误情况
-          this.handleLoginError('获取用户信息失败，请稍后重试');
-          
-          // 尝试使用备用方案登录（仅使用code登录，不获取用户信息）
-          wx.showModal({
-            title: '提示',
-            content: '是否使用简化登录方式继续？（将不会获取您的头像和昵称）',
-            success: (res) => {
-              if (res.confirm) {
-                this.setData({ isLoading: true });
-                
-                // 获取登录凭证
-                wx.login({
-                  success: (loginRes) => {
-                    if (loginRes.code) {
-                      this.handleLoginWithoutUserInfo(loginRes.code);
-                    } else {
-                      this.handleLoginError('获取登录凭证失败');
-                    }
-                  },
-                  fail: (err) => {
-                    console.error('wx.login 失败:', err);
-                    this.handleLoginError('微信登录失败，请检查网络连接');
-                  }
-                });
-              }
-            }
-          });
-        }
+        console.error('wx.login 失败:', err);
+        this.handleLoginError('微信登录失败，请检查网络连接');
       }
-    });
-  },
-  
-  /**
-   * 备用登录方案 - 仅使用code登录，不获取用户信息
-   */
-  handleLoginWithoutUserInfo: function(code) {
-    console.log('尝试使用备用登录方案...');
-    
-    this.setData({ isLoading: true });
-    
-    // 使用默认用户信息
-    const defaultUserInfo = {
-      nickName: '天龙用户',
-      avatarUrl: '/image/profile.png',
-      gender: 0
-    };
-    
-    // 调用后端登录接口
-    wechatApi.login({
-      code: code,
-      userInfo: defaultUserInfo
-    }).then(res => {
-      console.log('备用方案登录返回:', res);
-      
-      // 检查返回的数据结构（token 与 user 都在 res.data 下）
-      if (res.code === 0 || res.authenticated === true) {
-        // 保存登录信息
-        const token = res.data?.token || res.token;
-        // 后端 user 对象头像字段为 wechat_avatar，前端统一为 avatarUrl
-        const rawUser = res.data?.user || res.user || defaultUserInfo;
-        const userInfo = {
-          ...rawUser,
-          nickName: rawUser.wechat_nickname || rawUser.nickName || rawUser.name || defaultUserInfo.nickName,
-          avatarUrl: rawUser.wechat_avatar || rawUser.avatarUrl || defaultUserInfo.avatarUrl,
-          gender: rawUser.gender || defaultUserInfo.gender || 0
-        };
-
-        if (!token) {
-          this.handleLoginError('登录失败: 未获取到有效的登录凭证');
-          return;
-        }
-        
-        wechatApi.saveLoginInfo({
-          token: token,
-          userInfo: userInfo
-        });
-        
-        // 更新页面状态
-        this.setData({
-          userInfo: userInfo,
-          hasUserInfo: true,
-          isLoading: false
-        });
-        
-        wx.showToast({
-          title: '登录成功',
-          icon: 'success'
-        });
-        
-        // 处理登录成功后的跳转
-        setTimeout(() => {
-          authUtils.handleAuthRedirect();
-        }, 1500);
-      } else {
-        this.handleLoginError('登录失败: ' + (res.msg || '未知错误'));
-      }
-    }).catch(err => {
-      console.error('备用方案登录请求失败:', err);
-      this.handleLoginError('登录请求失败: ' + (err.message || '网络错误'));
     });
   },
 
   /**
    * 处理登录错误
    */
-  handleLoginError: function(errorMsg) {
+  handleLoginError: function (errorMsg) {
     console.error(errorMsg);
     this.setData({ isLoading: false });
-    wx.showToast({
-      title: errorMsg,
-      icon: 'none'
-    });
+    wx.showToast({ title: errorMsg, icon: 'none' });
   },
 
   /**
    * 退出登录
    */
-  handleLogout: function() {
+  handleLogout: function () {
     wx.showModal({
       title: '提示',
       content: '确定要退出登录吗？',
@@ -314,12 +334,11 @@ Page({
           wechatApi.clearLoginInfo();
           this.setData({
             userInfo: {},
-            hasUserInfo: false
+            hasUserInfo: false,
+            editingNickname: false,
+            nicknameDraft: ''
           });
-          wx.showToast({
-            title: '已退出登录',
-            icon: 'success'
-          });
+          wx.showToast({ title: '已退出登录', icon: 'success' });
         }
       }
     });
@@ -328,7 +347,7 @@ Page({
   /**
    * 跳转到收藏的菜谱详情
    */
-  goToRecipeDetail: function(e) {
+  goToRecipeDetail: function (e) {
     const id = e.currentTarget.dataset.id;
     console.log('[profile] goToRecipeDetail 触发, id =', id)
     if (!id) {
@@ -344,7 +363,7 @@ Page({
       }
     });
   },
-  
+
   /**
    * 用户点击右上角分享
    */

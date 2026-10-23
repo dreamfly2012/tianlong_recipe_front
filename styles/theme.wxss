@@ -156,7 +156,7 @@
   background-color: #EEE;
   display: block;
 }
-.recipe-card .body { padding: 16rpx 18rpx 20rpx; }
+.recipe-card .body { padding: 16rpx 18rpx 18rpx; }
 .recipe-card .name {
   font-size: 28rpx;
   font-weight: 600;
@@ -168,9 +168,44 @@
   overflow: hidden;
 }
 .recipe-card .meta {
-  margin-top: 10rpx;
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
   font-size: 22rpx;
   color: var(--text-2);
+  height: 36rpx;
+}
+.recipe-card .meta-item {
+  display: inline-flex;
+  align-items: center;
+}
+.recipe-card .meta-sep {
+  width: 1rpx;
+  height: 20rpx;
+  background: var(--border);
+  margin: 0 12rpx;
+  flex-shrink: 0;
+}
+.recipe-card .tags {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  height: 32rpx;
+  align-items: center;
+  margin-top: 6rpx;
+}
+/* 收窄全局 .tag 的纵向内边距，避免 3 个胶囊在 32rpx 行高内被裁切 */
+.recipe-card .tags .tag {
+  flex-shrink: 0;
+  height: 32rpx;
+  padding: 0 14rpx;
+  margin: 0 8rpx 0 0;
+  line-height: 32rpx;
+}
+.recipe-card .tags .tag-more {
+  font-size: 22rpx;
+  color: var(--text-2);
+  margin-left: 4rpx;
 }
 
 /* ---------- 顶部搜索栏（通用） ---------- */
