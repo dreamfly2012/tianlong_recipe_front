@@ -1,7 +1,7 @@
 <!--ai/result.wxml-->
 <view class="result-detail-container">
 
-  <!-- 加载中：可爱 AI 厨师思考动画 -->
+  <!-- 加载中：可爱厨师思考动画 -->
   <view class="loading-mask chef-loading" wx:if="{{loading}}">
     <view class="chef-stage">
       <!-- 飘动的食材 -->
@@ -21,7 +21,7 @@
       </view>
 
       <view class="chef-text">{{loadingText}}<text class="chef-dots"><text class="cd">.</text><text class="cd">.</text><text class="cd">.</text></text></view>
-      <view class="chef-sub">AI 正在为你量身定制专属菜谱，马上就好~</view>
+      <view class="chef-sub">正在为你量身定制专属菜谱，马上就好~</view>
     </view>
   </view>
 

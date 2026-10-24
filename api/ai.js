@@ -4,8 +4,7 @@ const { request } = require('../utils/util.js')
 function getDailyRecommend() {
   return request({
     url: '/api/recipe.daily',
-    method: 'GET',
-    requiresAuth: true
+    method: 'GET'
   })
 }
 
@@ -14,8 +13,7 @@ function getRecipesByIngredients(ingredients) {
   return request({
     url: '/api/recipe.ai',
     method: 'POST',
-    data: { ingredients },
-    requiresAuth: true
+    data: { ingredients }
   })
 }
 
@@ -23,19 +21,17 @@ function getRecipesByIngredients(ingredients) {
 function getPersonalizedRecommend() {
   return request({
     url: '/api/recipe.personalized',
-    method: 'GET',
-    requiresAuth: true
+    method: 'GET'
   })
 }
 
-// 获取智能菜单规划
+// 获取专属菜单规划
 function getGenerateRecipe(data) {
   return request({
     url: '/api/recipe.generate',
     method: 'POST',
     data: data,
-    requiresAuth: true,
-    // AI 生成本就较慢，给足 60s，但绝不会无限挂起
+    // 专属菜单接口较慢，给足 60s，但绝不会无限挂起
     timeout: 60000
   })
 }

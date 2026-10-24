@@ -3,7 +3,7 @@ const { normalizeRecipe } = require("../../utils/image");
 
 // 加载时循环展示的可爱文案
 const LOADING_TEXTS = [
-  '🤖 AI 厨师正在思考中',
+  '👨‍🍳 厨师正在思考中',
   '🥕 正在挑选新鲜食材',
   '🍳 正在调配完美火候',
   '📖 正在撰写专属菜谱',
@@ -28,7 +28,7 @@ Page({
     }
 
     if (!payload) {
-      this.setData({ loading: false, error: '参数错误，请重新生成' });
+      this.setData({ loading: false, error: '参数错误，请重新尝试' });
       return;
     }
 
@@ -43,7 +43,7 @@ Page({
     this._guardTimer = setTimeout(() => {
       if (this.data.loading) {
         this.stopLoadingAnim();
-        this.setData({ loading: false, error: '生成超时，请检查网络后重试' });
+        this.setData({ loading: false, error: '请求超时，请检查网络后重试' });
       }
     }, 61000);
 
@@ -55,13 +55,13 @@ Page({
         if (res && res.data) {
           this.setData({ recipe: normalizeRecipe(res.data), loading: false });
         } else {
-          this.setData({ loading: false, error: (res && res.msg) || '生成失败，请稍后重试' });
+          this.setData({ loading: false, error: (res && res.msg) || '菜谱获取失败，请稍后重试' });
         }
       })
       .catch(err => {
         this.clearGuard();
         this.stopLoadingAnim();
-        const msg = (err && err.message) || '生成失败，请稍后重试';
+        const msg = (err && err.message) || '菜谱获取失败，请稍后重试';
         this.setData({ loading: false, error: msg });
       });
   },

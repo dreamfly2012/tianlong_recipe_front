@@ -47,12 +47,12 @@ const personalizedRecipes= [{
 
 
 //图片采用绝对地址/开头
-// AI 生成的食谱示例
+// 专属食谱示例
 const aiGeneratedRecipes = [
   {
     id: 101,
     title: '香煎三文鱼配芦笋',
-    description: 'AI 根据您的喜好生成的健康低脂食谱',
+    description: '根据您的喜好搭配的健康低脂食谱',
     image: '/mock/images/xiangijansanwenyulusun.jpg',
     ingredients: ['三文鱼', '芦笋', '橄榄油', '柠檬', '盐', '黑胡椒'],
     steps: [
@@ -65,12 +65,12 @@ const aiGeneratedRecipes = [
     ],
     cookingTime: 15,
     difficulty: '简单',
-    tags: ['海鲜', '低脂', 'AI生成']
+    tags: ['海鲜', '低脂', '精选']
   },
   {
     id: 102,
     title: '藜麦蔬菜沙拉',
-    description: 'AI 推荐的营养均衡素食料理',
+    description: '营养均衡素食料理',
     image: '/mock/images/limaishala.jpg',
     ingredients: ['藜麦', '黄瓜', '番茄', '鳄梨', '柠檬汁', '橄榄油', '盐'],
     steps: [
@@ -82,7 +82,7 @@ const aiGeneratedRecipes = [
     ],
     cookingTime: 20,
     difficulty: '简单',
-    tags: ['素食', '沙拉', '健康', 'AI生成']
+    tags: ['素食', '沙拉', '健康', '轻食']
   }
 ];
 
@@ -113,17 +113,17 @@ const mockData = {
     };
   },
   
-  // AI 生成食谱
+  // 专属食谱
   '/api/ai/generate-recipe': (options) => {
     const { ingredients = [], preferences = [], excludes = [] } = options.data || {};
     
-    // 模拟 AI 生成过程，随机选择一个预设的食谱
+    // 随机选择一个预设的食谱
     const randomIndex = Math.floor(Math.random() * aiGeneratedRecipes.length);
     const recipe = { ...aiGeneratedRecipes[randomIndex] };
     
     // 添加一些根据用户输入的定制信息
     if (ingredients.length > 0) {
-      recipe.description = `基于${ingredients.join('、')}生成的食谱`;
+      recipe.description = `基于${ingredients.join('、')}搭配的食谱`;
     }
     
     if (preferences.length > 0) {
@@ -163,7 +163,7 @@ const mockData = {
   '/api/ai/meal-plan': (options) => {
     const { days = 3, preferences = [], excludes = [] } = options.data || {};
     
-    // 生成膳食计划
+    // 搭配膳食计划
     const mealPlan = [];
     for (let i = 0; i < days; i++) {
       mealPlan.push({

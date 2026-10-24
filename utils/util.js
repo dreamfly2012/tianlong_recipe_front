@@ -82,8 +82,11 @@ const request = (options) => {
               app.globalData.isLoggedIn = false;
               app.globalData.userInfo = null;
             }
-            notify({ title: '登录已过期，请重新登录', icon: 'none', duration: 2000 });
-            if (!silent) setTimeout(() => wx.switchTab({ url: '/pages/profile/index' }), 1800);
+            // 仅当该请求本身需要鉴权时才提示并跳登录；匿名接口 401 不劫持页面
+            if (requiresAuth) {
+              notify({ title: '登录已过期，请重新登录', icon: 'none', duration: 2000 });
+              if (!silent) setTimeout(() => wx.switchTab({ url: '/pages/profile/index' }), 1800);
+            }
             reject(new Error('登录已过期'));
             return;
           }

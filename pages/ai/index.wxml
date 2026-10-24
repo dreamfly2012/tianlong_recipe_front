@@ -1,21 +1,13 @@
 <!--ai/index.wxml-->
 <view class="ai-page">
 
-  <!-- 未登录引导 -->
-  <view class="login-banner" wx:if="{{needLogin}}">
-    <view class="login-banner-title">👋 欢迎使用 AI 美食助手</view>
-    <view class="login-banner-sub">登录后即可查看专属推荐、生成智能菜单</view>
-    <button class="login-banner-btn" bindtap="goLogin">微信登录</button>
-  </view>
-
   <!-- 头部 -->
   <view class="hero">
-    <view class="hero-title">AI 智能美食助手</view>
+    <view class="hero-title">专属美食推荐</view>
     <view class="hero-sub">懂你的口味，更懂你的厨房</view>
   </view>
 
-  <!-- 今日推荐 + 为你推荐：仅登录后展示 -->
-  <block wx:if="{{!needLogin}}">
+  <!-- 今日推荐 -->
   <view class="section">
     <view class="section-title">今日推荐</view>
     <scroll-view scroll-x="true" class="recipe-scroll" wx:if="{{dailyRecipes.length}}">
@@ -28,9 +20,9 @@
     <view class="skeleton-row" wx:elif="{{loadingDaily}}">
       <view class="skeleton recipe-skel" wx:for="{{3}}" wx:key="*this"></view>
     </view>
-    <view class="empty" wx:else>
-      <view class="text">登录后查看专属推荐</view>
-    </view>
+      <view class="empty" wx:else>
+        <view class="text">暂无推荐</view>
+      </view>
   </view>
 
   <!-- 为你推荐：网格 -->
@@ -48,21 +40,19 @@
     <view class="skeleton-grid" wx:elif="{{loadingPersonal}}">
       <view class="skeleton recipe-skel" wx:for="{{4}}" wx:key="*this"></view>
     </view>
-    <view class="empty" wx:else>
-      <view class="text">暂无推荐，去生成专属菜单吧</view>
-    </view>
+      <view class="empty" wx:else>
+        <view class="text">暂无推荐，去定制专属菜单吧</view>
+      </view>
   </view>
 
-  </block>
-
-  <!-- 智能菜单 -->
+  <!-- 专属菜单 -->
   <view class="section">
     <view class="menu-card" bindtap="goMenu">
       <view class="menu-card-text">
-        <view class="menu-card-title">🍱 智能菜单规划</view>
-        <view class="menu-card-sub">告诉我你的食材与偏好，生成一周不重样的菜单</view>
+        <view class="menu-card-title">🍱 专属菜单规划</view>
+        <view class="menu-card-sub">告诉我你的食材与偏好，搭配一周不重样的菜单</view>
       </view>
-      <view class="menu-card-btn">去生成</view>
+      <view class="menu-card-btn">去定制</view>
     </view>
   </view>
 

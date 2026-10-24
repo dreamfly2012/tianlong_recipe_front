@@ -3,14 +3,7 @@ Page({
     ingredientsInput: '',
     preferencesInput: '',
     excludesInput: '',
-    errorMsg: '',
-    needLogin: false
-  },
-  onShow() {
-    this.setData({ needLogin: !this.isLoggedIn() });
-  },
-  isLoggedIn() {
-    return !!wx.getStorageSync('token');
+    errorMsg: ''
   },
   onIngredientsInput(e) {
     this.setData({ ingredientsInput: e.detail.value });
@@ -21,18 +14,7 @@ Page({
   onExcludesInput(e) {
     this.setData({ excludesInput: e.detail.value });
   },
-  // 跳转「我的」页去登录
-  goLogin() {
-    wx.switchTab({ url: '/pages/profile/index' });
-  },
   generateMenu() {
-    // 智能菜单生成需登录
-    if (!this.isLoggedIn()) {
-      wx.showToast({ title: '请先登录', icon: 'none' });
-      setTimeout(() => wx.switchTab({ url: '/pages/profile/index' }), 1200);
-      return;
-    }
-
     const ingredients = this.data.ingredientsInput.split(',').map(s => s.trim()).filter(Boolean);
     const preferences = this.data.preferencesInput.split(',').map(s => s.trim()).filter(Boolean);
     const excludes = this.data.excludesInput.split(',').map(s => s.trim()).filter(Boolean);

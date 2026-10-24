@@ -105,7 +105,7 @@ page {
   padding-top: 4rpx;
 }
 
-/* ===== 可爱 AI 厨师加载动画（高对比度，色弱友好） ===== */
+/* ===== 可爱厨师加载动画（高对比度，色弱友好） ===== */
 .chef-loading {
   flex-direction: column;
   background: linear-gradient(160deg, #FFF7EF 0%, #FFE9D6 100%);
