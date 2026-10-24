@@ -1,4 +1,4 @@
-// AI 功能页
+// 美食推荐页
 const app = getApp()
 import { getDailyRecommend, getPersonalizedRecommend } from '../../api/ai.js'
 const { normalizeRecipes } = require('../../utils/image.js')
@@ -8,8 +8,7 @@ Page({
     dailyRecipes: [],
     personalizedRecipes: [],
     loadingDaily: true,
-    loadingPersonal: true,
-    needLogin: false
+    loadingPersonal: true
   },
 
   onLoad: function () {
@@ -21,30 +20,14 @@ Page({
     this.syncLoginAndLoad()
   },
 
-  // 同步登录态：未登录展示登录引导，已登录加载推荐
+  // 直接加载推荐（美食推荐页无需登录）
   syncLoginAndLoad: function () {
-    const needLogin = !this.isLoggedIn()
-    this.setData({ needLogin })
-    if (needLogin) {
-      this.setData({ dailyRecipes: [], personalizedRecipes: [], loadingDaily: false, loadingPersonal: false })
-      return
-    }
     this.loadDailyRecommend()
     this.loadPersonalizedRecommend()
   },
 
-  // 是否已登录（避免未登录时反复触发强制登录跳转）
-  isLoggedIn: function () {
-    return !!wx.getStorageSync('token')
-  },
-
   loadDailyRecommend: function () {
     this.setData({ loadingDaily: true })
-    // 未登录时直接显示空态，不调用需鉴权接口
-    if (!this.isLoggedIn()) {
-      this.setData({ dailyRecipes: [], loadingDaily: false })
-      return
-    }
     getDailyRecommend().then(res => {
       this.setData({ dailyRecipes: normalizeRecipes(res), loadingDaily: false })
     }).catch(() => {
@@ -54,10 +37,6 @@ Page({
 
   loadPersonalizedRecommend: function () {
     this.setData({ loadingPersonal: true })
-    if (!this.isLoggedIn()) {
-      this.setData({ personalizedRecipes: [], loadingPersonal: false })
-      return
-    }
     getPersonalizedRecommend().then(res => {
       this.setData({ personalizedRecipes: normalizeRecipes(res), loadingPersonal: false })
     }).catch(() => {
@@ -66,17 +45,7 @@ Page({
   },
 
   goMenu: function () {
-    if (!this.isLoggedIn()) {
-      wx.showToast({ title: '请先登录', icon: 'none' })
-      setTimeout(() => wx.switchTab({ url: '/pages/profile/index' }), 1200)
-      return
-    }
     wx.navigateTo({ url: '/pages/ai/menu' })
-  },
-
-  // 跳转「我的」页去登录
-  goLogin: function () {
-    wx.switchTab({ url: '/pages/profile/index' })
   },
 
   jumpDetail: function (e) {

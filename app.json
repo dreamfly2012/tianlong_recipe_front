@@ -28,9 +28,9 @@
       "selectedIconPath": "image/category.png"
     },{
       "pagePath": "pages/ai/index",
-      "text": "智能助手",
-      "iconPath": "image/ai_black.png",
-      "selectedIconPath": "image/ai.png"
+      "text": "美食推荐",
+      "iconPath": "image/food_black.png",
+      "selectedIconPath": "image/food.png"
     },{
       "pagePath": "pages/profile/index",
       "text": "我的",
